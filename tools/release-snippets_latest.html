@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release Snippets</title>
+<style>
+:root{--bg:#fff;--bg2:#f6f8fa;--bg3:#eaeef2;--bd:#d0d7de;--fg:#1f2328;--mut:#656d76;--acc:#0969da;--grn:#1a7f37;--grnbg:#dafbe1;--red:#cf222e;--redbg:#ffebe9;--yel:#9a6700;--yelbg:#fff8c5;--blubg:#ddf4ff;--btn:#f6f8fa;--pri:#1f883d;--sh:0 1px 0 rgba(31,35,40,.04)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bd:#30363d;--fg:#e6edf3;--mut:#8d96a0;--acc:#4493f8;--grn:#3fb950;--grnbg:#12261e;--red:#f85149;--redbg:#2d1214;--yel:#d29922;--yelbg:#2b2110;--blubg:#102a43;--btn:#21262d;--pri:#238636;--sh:none}}
+:root[data-theme="dark"]{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bd:#30363d;--fg:#e6edf3;--mut:#8d96a0;--acc:#4493f8;--grn:#3fb950;--grnbg:#12261e;--red:#f85149;--redbg:#2d1214;--yel:#d29922;--yelbg:#2b2110;--blubg:#102a43;--btn:#21262d;--pri:#238636;--sh:none}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;display:flex;flex-direction:column}
+.mono,textarea.code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--bd)}
+header h1{font-size:15px;margin:0;font-weight:600;white-space:nowrap}
+header .sp{flex:1}
+.search{position:relative;width:min(340px,40vw)}
+.search input{width:100%;padding:5px 10px 5px 30px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--fg);font:inherit}
+.search svg{position:absolute;left:9px;top:8px;fill:var(--mut)}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:-1px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--btn);border:1px solid var(--bd);border-radius:6px;color:var(--fg);font:500 13px/20px inherit;font-family:inherit;cursor:pointer;box-shadow:var(--sh);white-space:nowrap}
+.btn:hover{background:var(--bg3)}
+.btn.pri{background:var(--pri);border-color:transparent;color:#fff}.btn.pri:hover{filter:brightness(1.1)}
+.btn.dng{color:var(--red)}.btn.sm{padding:1px 8px;font-size:12px}
+.btn svg,.ico svg{fill:currentColor}
+.ico{background:none;border:0;color:var(--mut);cursor:pointer;padding:4px;border-radius:6px;display:inline-flex}
+.ico:hover{background:var(--bg3);color:var(--fg)}
+main{flex:1;display:flex;min-height:0}
+aside{width:300px;flex:none;border-right:1px solid var(--bd);overflow:auto;padding:12px;background:var(--bg)}
+aside .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.folder>.fh{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;cursor:pointer;font-weight:600}
+.folder>.fh:hover{background:var(--bg2)}
+.folder .fh .n{margin-left:auto;font-weight:400;color:var(--mut);font-size:12px}
+.folder .fh .ico{padding:2px}
+.rel{display:block;margin:1px 0 1px 18px;padding:5px 8px;border-radius:6px;cursor:pointer;border-left:2px solid transparent}
+.rel:hover{background:var(--bg2)}
+.rel.on{background:var(--blubg);border-left-color:var(--acc)}
+.rel b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rel small{color:var(--mut);display:flex;gap:6px;align-items:center}
+section.view{flex:1;overflow:auto;padding:24px 32px 80px}
+.wrap{max-width:980px;margin:0 auto}
+.crumb{color:var(--mut);margin-bottom:6px}
+.title{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.title h2{margin:0;font-size:24px;font-weight:600;flex:1;min-width:200px}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:0 8px;border:1px solid var(--bd);border-radius:2em;font-size:12px;font-weight:500;line-height:20px;background:var(--bg2)}
+.s-Draft{color:var(--mut)}.s-Approved{color:var(--acc);background:var(--blubg)}.s-Deployed{color:var(--grn);background:var(--grnbg)}.s-Rolled\ back{color:var(--red);background:var(--redbg)}
+select.st{background:var(--btn);color:var(--fg);border:1px solid var(--bd);border-radius:6px;padding:3px 6px;font:inherit}
+.bar{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;flex:1;min-width:120px;max-width:260px}
+.bar i{display:block;height:100%;background:var(--grn);transition:width .25s}
+.box{border:1px solid var(--bd);border-radius:6px;margin:16px 0;background:var(--bg)}
+.box>.bh{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-bottom:1px solid var(--bd);border-radius:6px 6px 0 0;font-weight:600}
+.box>.bh .c{background:var(--bg3);border-radius:2em;padding:0 7px;font-size:12px;font-weight:500}
+.box>.bh .sp{flex:1}
+.box.rb{border-color:var(--red)}.box.rb>.bh{background:var(--redbg);color:var(--red);border-color:var(--red)}
+.empty{padding:18px;text-align:center;color:var(--mut)}
+.cmd{border-bottom:1px solid var(--bd)}.cmd:last-child{border:0}
+.cmd.done .ed{opacity:.55}.cmd.done .lbl{text-decoration:line-through}
+.cmd.done{box-shadow:inset 3px 0 0 var(--grn)}
+.tick{background:none;border:0;padding:2px;border-radius:50%;cursor:pointer;color:var(--mut);display:inline-flex;transition:color .15s,transform .15s}
+.tick svg{fill:currentColor}.tick:hover{color:var(--grn)}.tick:active{transform:scale(.88)}.tick.on{color:var(--grn)}
+.ch{display:flex;align-items:center;gap:6px;padding:6px 10px}
+.ch input[type=checkbox]{accent-color:var(--grn);width:16px;height:16px;margin:0}
+.lbl{flex:1;background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 6px;color:var(--fg);font:inherit;font-weight:500;min-width:0}
+.lbl:hover{border-color:var(--bd)}
+.ed{position:relative;border-top:1px solid var(--bd);background:var(--bg2)}
+.ed pre.hl,.ed textarea.code{margin:0;padding:10px 14px;font-size:12.5px;line-height:1.55;tab-size:2;white-space:pre;letter-spacing:0;word-spacing:0}
+.ed pre.hl{position:absolute;inset:0;overflow:hidden;pointer-events:none;color:var(--fg)}
+.ed pre.hl code{font:inherit}
+textarea.code{display:block;position:relative;z-index:1;width:100%;border:0;background:transparent;color:transparent;caret-color:var(--fg);resize:vertical;overflow:auto;min-height:44px}
+textarea.code::placeholder{color:var(--mut)}
+textarea.code::selection{background:rgba(56,139,253,.35)}
+select.lang{background:var(--btn);color:var(--mut);border:1px solid var(--bd);border-radius:6px;padding:1px 4px;font:12px inherit;font-family:inherit;max-width:120px}
+.t-kw{color:var(--t-kw)}.t-str{color:var(--t-str)}.t-num{color:var(--t-num)}.t-cmt{color:var(--t-cmt);font-style:italic}
+.t-fn{color:var(--t-fn)}.t-var{color:var(--t-var)}.t-flag{color:var(--t-flag)}.t-cmd{color:var(--t-fn);font-weight:600}
+.t-sect{color:var(--t-num);font-weight:600}.t-key{color:var(--t-var)}.t-path{color:var(--t-str)}
+:root{--t-kw:#cf222e;--t-str:#0a3069;--t-num:#0550ae;--t-cmt:#6e7781;--t-fn:#8250df;--t-var:#953800;--t-flag:#116329}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--t-kw:#ff7b72;--t-str:#a5d6ff;--t-num:#79c0ff;--t-cmt:#8b949e;--t-fn:#d2a8ff;--t-var:#ffa657;--t-flag:#7ee787}}
+:root[data-theme="dark"]{--t-kw:#ff7b72;--t-str:#a5d6ff;--t-num:#79c0ff;--t-cmt:#8b949e;--t-fn:#d2a8ff;--t-var:#ffa657;--t-flag:#7ee787}
+.box.val{border-color:var(--grn)}.box.val>.bh{background:var(--grnbg);color:var(--grn);border-color:var(--grn)}
+.box>.bh[data-act=fold]{cursor:pointer;user-select:none}
+.box.folded>.bh{border-bottom:0;border-radius:6px}
+.chev{display:inline-flex;transition:transform .15s;color:inherit}.box.folded .chev{transform:rotate(-90deg)}
+#pa{display:none}
+@media print{
+ html,body{height:auto!important;display:block!important;background:#fff!important}
+ body>*:not(#pa){display:none!important}
+ #pa{display:block;color:#000;background:#fff;font:12px/1.45 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;--t-kw:#cf222e;--t-str:#0a3069;--t-num:#0550ae;--t-cmt:#6e7781;--t-fn:#8250df;--t-var:#953800;--t-flag:#116329}
+ #pa h1{font-size:20px;margin:0 0 8px}
+ #pa h2{font-size:14px;margin:16px 0 6px;padding-bottom:3px;border-bottom:1px solid #999}
+ #pa h2 span{font-weight:400;color:#555;font-size:12px}
+ .pm{width:100%;border-collapse:collapse;margin-bottom:8px}.pm th,.pm td{border:1px solid #bbb;padding:4px 8px;text-align:left;vertical-align:top}.pm th{background:#f0f0f0;width:18%}
+ .pbar{height:7px;border:1px solid #777;border-radius:4px;margin:3px 0;overflow:hidden}
+ .pbar i{display:block;height:100%;background:#1a7f37;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .pc{break-inside:avoid;margin:6px 0}.pl{font-weight:600}.pl b{font-size:14px}
+ #pa pre{margin:3px 0 0;padding:6px 8px;border:1px solid #ccc;background:#f6f8fa;font:11px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .pf{margin-top:14px;color:#666;font-size:10px}
+}
+.sorts{display:grid;gap:6px;margin:0 0 12px;padding:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:6px;font-size:12px;color:var(--mut)}
+.sorts label{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sorts select{background:var(--btn);color:var(--fg);border:1px solid var(--bd);border-radius:6px;padding:2px 6px;font:inherit;max-width:60%}
+.rel[draggable=true]{cursor:grab}
+.vbadge{background:var(--bg3);border:1px solid var(--bd);border-radius:2em;padding:0 8px;font:500 12px/20px inherit;font-family:inherit;color:var(--mut);cursor:pointer}
+.vbadge:hover{color:var(--fg)}
+.lnk{background:none;border:0;color:var(--acc);cursor:pointer;font:inherit;padding:0}.lnk:hover{text-decoration:underline}
+#logdlg{width:min(560px,94vw)}
+.logbox{padding:16px 20px;max-height:80vh;overflow:auto}.logbox h3{margin:0 0 4px}
+.ver-item h4{margin:16px 0 4px;display:flex;gap:8px;align-items:center}.ver-item h4 small{color:var(--mut);font-weight:400}
+.ver-item ul{margin:0;padding-left:20px}.ver-item li{margin:2px 0}
+.logbox .row{display:flex;justify-content:flex-end;margin-top:16px}
+.tcards{display:grid;gap:8px}
+.tcard{display:flex;gap:10px;align-items:flex-start;margin:0!important;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-weight:400!important}
+.tcard:has(input:checked){border-color:var(--acc);background:var(--blubg)}
+.tcard b{display:block}.tcard small{color:var(--mut);display:block}
+dialog .chk{display:flex;gap:8px;align-items:center;font-weight:400}
+dialog input[type=radio],dialog input[type=checkbox]{width:auto;margin:3px 0 0}
+.nazone{border:1px dashed var(--bd);border-radius:6px;margin:16px 0;padding:8px 12px;background:var(--bg2)}
+.nah{font-weight:600;color:var(--mut);display:flex;gap:8px;align-items:center}
+.nah .c{background:var(--bg3);border-radius:2em;padding:0 7px;font-size:12px;font-weight:500}
+.nachip{display:flex;align-items:center;gap:8px;padding:6px 0;color:var(--mut)}
+.nachip>span:nth-child(2){flex:1;text-decoration:line-through}
+.naempty{color:var(--mut);padding:6px 0}
+.tb{display:flex;align-items:center;gap:8px;margin-top:18px;font-weight:600}.tb .sp{flex:1}
+.notes{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--fg);padding:8px 12px;font:inherit;resize:vertical;min-height:70px}
+.hero{max-width:520px;margin:12vh auto;text-align:center;color:var(--mut)}
+.hero h2{color:var(--fg)}
+dialog{border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--fg);padding:0;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(1,4,9,.6)}
+dialog form{padding:16px 20px}
+dialog h3{margin:0 0 12px}
+dialog label{display:block;font-weight:600;margin:10px 0 4px}
+dialog input,dialog textarea{width:100%;padding:5px 10px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--fg);font:inherit}
+dialog .row{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;font-weight:500;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+mark{background:var(--yelbg);color:inherit;border-radius:3px}
+.path{display:flex;align-items:center;gap:10px;border:1px solid var(--bd);border-radius:6px;background:var(--bg2);padding:6px 10px;margin-bottom:14px}
+.path code{flex:1;overflow-wrap:anywhere;font-size:12.5px}
+.grip{cursor:grab;color:var(--mut);padding:3px 4px;border-radius:4px;display:inline-flex;user-select:none}
+.grip:hover{background:var(--bg3);color:var(--fg)}.grip:active{cursor:grabbing}.grip svg{fill:currentColor}
+.dragging{opacity:.35}
+.ov-t{box-shadow:0 -3px 0 0 var(--acc)}.ov-b{box-shadow:0 3px 0 0 var(--acc)}
+.ov-in{outline:2px dashed var(--acc);outline-offset:-2px}
+footer{padding:6px 16px;border-top:1px solid var(--bd);background:var(--bg2);color:var(--mut);font-size:12px;text-align:center}
+@media(max-width:800px){aside{position:absolute;z-index:5;height:calc(100% - 55px);transform:translateX(-100%);transition:.2s;width:86%}aside.open{transform:none}section.view{padding:16px}#menu{display:inline-flex!important}}
+#menu{display:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <button class="ico" id="menu" title="Toggle sidebar" data-act="menu"><svg width="18" height="18" viewBox="0 0 16 16"><path d="M1 2.75A.75.75 0 0 1 1.75 2h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 2.75Zm0 5A.75.75 0 0 1 1.75 7h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 7.75ZM1.75 12h12.5a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1 0-1.5Z"/></svg></button>
+  <h1>Release Snippets</h1><button class="vbadge" id="vbadge" data-act="changelog" title="View change log"></button>
+  <div class="search"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z"/></svg><input id="q" placeholder="Search releases, CAB, commands  ( / )" autocomplete="off"></div>
+  <span class="sp"></span>
+  <button class="btn" data-act="export">Export all</button>
+  <button class="btn" data-act="import">Import</button>
+  <button class="ico" data-act="theme" title="Switch theme"><svg width="18" height="18" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 1.5a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11ZM8 0a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1A.75.75 0 0 1 8 0Zm0 14.5a.75.75 0 0 1 .75.75v1a.75.75 0 0 1-1.5 0v-1a.75.75 0 0 1 .75-.75Z"/></svg></button>
+  <input type="file" id="file" accept=".json" hidden>
+</header>
+<main>
+  <aside id="side"></aside>
+  <section class="view" id="view"></section>
+</main>
+<footer>Release Snippets <button class="lnk" data-act="changelog">v<span class="vtxt"></span> change log</button> &middot; Developed by Habib AlMawali</footer>
+<dialog id="logdlg"><div class="logbox"></div></dialog>
+<dialog id="dlg"><form method="dialog" id="dform"></form></dialog>
+<div id="toast"></div>
+<div id="pa"></div>
+
+<script>
+/* ---------- version and change log ----------
+   When you release a change: add a NEW entry at the TOP of CHANGELOG and APP_VERSION follows it automatically.
+   Entry: {v:'1.9.0', date:'YYYY-MM-DD', changes:['What changed', ...]}   */
+const CHANGELOG=[
+ {v:'1.9.0',date:'2026-11-18',changes:['The green New button now creates a release','Deployment date is selected in the New release dialog; date folders are created automatically']},
+ {v:'1.8.0',changes:['Added site version badge and this change log','Exports now record the version of the site that created them']},
+ {v:'1.7.0',changes:['Sort deployment dates (newest or oldest first)','Sort releases by manual drag order, title, CAB reference or status','Drag a release onto another date folder to move it','Export a single release as an importable file','Import asks whether to append to existing data or clear everything and import as fresh','Fresh sessions start empty with no sample data']},
+ {v:'1.6.0',changes:['Release templates: Blank and Middleware ACE Template','Sections are now per release: rename, delete, reorder, fold, mark N/A and choose whether they count in progress','Templates can be added in the TEMPLATES list']},
+ {v:'1.5.0',changes:['Change a deployment date, merging into an existing date folder if needed','Move a release to another date from Edit release','Create custom sections']},
+ {v:'1.4.0',changes:['Copy as Markdown includes progress and completion checkboxes, and hides N/A sections','Print button prints the same content in a clean black on white layout']},
+ {v:'1.3.0',changes:['Mark as completed icon on every command, with completion time tooltip','Progress excludes post deployment validation and rollback','Not applicable section: mark by icon click or drag']},
+ {v:'1.2.0',changes:['Offline syntax highlighting with auto detection for SQL, MQSC, ACE, ODBC/INI and Shell','New ODBC and Post deployment validation sections','Foldable sections with Collapse all and Expand all']},
+ {v:'1.1.0',changes:['UAT release file path on each release','Drag and drop to reorder commands and sections','Removed logo, added developer credit']},
+ {v:'1.0.0',changes:['Deployment date folders containing releases with title and CAB reference','Command groups: Database query, MQ command, ACE command, Rollback script','One click copy, inline editing, local storage, JSON export and import','GitHub style light and dark UI']}
+];
+const APP_VERSION=CHANGELOG[0].v;
+const KEY='release-snippets-v1', THEME='release-snippets-theme';
+const STATUS=['Draft','Approved','Deployed','Rolled back'];
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=s=>document.querySelector(s);
+let data=load(), sel=null, q='', open={};
+
+/* ---------- release templates ----------
+   To add a template, append an object to TEMPLATES:
+   {id:'unique-id', name:'Shown name', desc:'One line description',
+    sections:[{name:'Section name', lang:'sql|mqsc|ace|ini|sh', skip:false, tone:''}]}
+   skip:true  = commands in this section are not counted in the progress indicator
+   tone:'ok'|'bad' = green or red section header (e.g. validation, rollback)   */
+const TEMPLATES=[
+ {id:'blank',name:'Blank',desc:'No predefined sections. Add your own sections as you go.',sections:[]},
+ {id:'ace',name:'Middleware ACE Template',desc:'Database query, MQ command, ACE command, ODBC, Post deployment validation and Rollback script.',sections:[
+   {name:'Database query',lang:'sql'},{name:'MQ command',lang:'mqsc'},{name:'ACE command',lang:'ace'},{name:'ODBC',lang:'ini'},
+   {name:'Post deployment validation',lang:'sh',skip:true,tone:'ok'},{name:'Rollback script',lang:'sh',skip:true,tone:'bad'}]}
+];
+const TPLKEY='release-snippets-tpl';
+let lastTpl='ace';try{lastTpl=localStorage.getItem(TPLKEY)||'ace'}catch(e){}
+/* older data stored fixed sections; convert each release to its own section list */
+function migrate(d){
+  const LEG=[['db','Database query','sql'],['mq','MQ command','mqsc'],['ace','ACE command','ace'],['odbc','ODBC','ini'],['val','Post deployment validation','sh'],['rb','Rollback script','sh']];
+  d.folders.forEach(f=>f.releases.forEach(r=>{
+    if(r.secs)return;
+    const cu=r.custom||[],isCu=k=>cu.some(c=>c.id===k),ids=[...LEG.map(x=>x[0]),...cu.map(c=>c.id)];
+    const o=(r.order||[]).filter(k=>ids.includes(k));
+    ids.forEach(k=>{if(!o.includes(k)){const i=o.indexOf(isCu(k)?'val':'rb');if(k==='rb'||i<0)o.push(k);else o.splice(i,0,k)}});
+    r.secs=o.map(k=>{const L=LEG.find(x=>x[0]===k);return L?{id:k,name:L[1],lang:L[2],skip:k==='val'||k==='rb',tone:k==='val'?'ok':k==='rb'?'bad':''}:{id:k,name:cu.find(c=>c.id===k).name,lang:'',skip:false,tone:''}});
+    r.s=r.s||{};r.secs.forEach(x=>{r.s[x.id]=r.s[x.id]||[]});
+    delete r.order;delete r.custom;
+  }));
+  return d;
+}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.folders)return migrate(d)}catch(e){}return {folders:[]}}
+let t;function save(){clearTimeout(t);t=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){toast('Storage full: export your data')}},150)}
+const PKEY='release-snippets-prefs';let prefs={dates:'desc',rels:'manual'};
+try{Object.assign(prefs,JSON.parse(localStorage.getItem(PKEY))||{})}catch(e){}
+const savePrefs=()=>{try{localStorage.setItem(PKEY,JSON.stringify(prefs))}catch(e){}};
+const sortedFolders=()=>[...data.folders].sort((a,b)=>prefs.dates==='asc'?a.date.localeCompare(b.date):b.date.localeCompare(a.date));
+function sortedReleases(f){
+  const a=[...f.releases],m=prefs.rels,cmp=(x,y)=>String(x||'').localeCompare(String(y||''),undefined,{numeric:true,sensitivity:'base'});
+  if(m==='title')a.sort((x,y)=>cmp(x.title,y.title));
+  else if(m==='title-desc')a.sort((x,y)=>cmp(y.title,x.title));
+  else if(m==='cab')a.sort((x,y)=>cmp(x.cab,y.cab));
+  else if(m==='status')a.sort((x,y)=>STATUS.indexOf(x.status)-STATUS.indexOf(y.status)||cmp(x.title,y.title));
+  return a;
+}
+function moveRel(id,d){
+  const [sf,r]=find(id);let tf;
+  tf=d.rid?find(d.rid)[0]:data.folders.find(x=>x.id===d.fid);
+  sf.releases=sf.releases.filter(x=>x!==r);
+  if(d.rid)tf.releases.splice(tf.releases.findIndex(x=>x.id===d.rid)+(d.after?1:0),0,r);else tf.releases.push(r);
+  open[tf.id]=true;if(tf!==sf)toast('Moved to '+tf.date);
+}
+function find(id){for(const f of data.folders)for(const r of f.releases)if(r.id===id)return [f,r]}
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1600)}
+function copy(text){
+  const ok=()=>toast('Copied to clipboard');
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(ok,()=>fb());else fb();
+  function fb(){const a=document.createElement('textarea');a.value=text;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){toast('Copy failed')}a.remove()}
+}
+const ic={copy:'<svg width="14" height="14" viewBox="0 0 16 16"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>',
+ del:'<svg width="14" height="14" viewBox="0 0 16 16"><path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75ZM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15ZM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25Z"/></svg>',
+ plus:'<svg width="14" height="14" viewBox="0 0 16 16"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"/></svg>',
+ edit:'<svg width="14" height="14" viewBox="0 0 16 16"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758Zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Zm-.5 3.7L10.488 4.75l-6.56 6.56a.25.25 0 0 0-.065.108l-.558 1.953 1.953-.558a.25.25 0 0 0 .108-.064Z"/></svg>',
+ dir:'<svg width="16" height="16" viewBox="0 0 16 16" fill="#54aeff"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1Z"/></svg>'};
+
+ic.ok='<svg width="20" height="20" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"/></svg>';
+ic.circ='<svg width="20" height="20" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/></svg>';
+ic.grip='<svg width="14" height="14" viewBox="0 0 16 16"><path d="M5 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm0 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm9-11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm1 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>';
+/* ---------- syntax highlighting (offline, no libraries) ---------- */
+const W=w=>new RegExp('\\b(?:'+w+')\\b');
+const R={
+ cmtSql:/--[^\n]*|\/\*[\s\S]*?\*\//, cmtHash:/#[^\n]*/, cmtStar:/^[ \t]*\*[^\n]*/, cmtIni:/^[ \t]*[;#][^\n]*/,
+ str:/'(?:[^'\n]|'')*'|"(?:[^"\\\n]|\\.)*"/, num:/\b\d+(?:\.\d+)?\b/, flag:/(?:^|\s)--?[A-Za-z][\w-]*/,
+ vr:/\$\{[^}\n]*\}|\$[A-Za-z_]\w*|%\w+%|&\w+|@\w+/, fn:/\b[A-Za-z_][\w.]*(?=\()/,
+ url:/https?:\/\/[^\s'"]+/,
+ path:/(?:~|\.{1,2})?\/[\w.\-${}*]+(?:\/[\w.\-${}*]*)*/
+};
+const SQLKW='select|from|where|and|or|not|in|is|null|insert|into|values|update|set|delete|create|alter|drop|table|index|view|add|column|primary|key|foreign|references|constraint|default|unique|check|join|inner|left|right|outer|on|as|group|by|order|having|distinct|union|all|commit|rollback|begin|end|declare|call|exec|execute|grant|revoke|to|with|case|when|then|else|truncate|merge|using|like|between|exists|limit|fetch|first|rows|only|if|procedure|function|trigger|sequence|schema|modify|rename|varchar|char|int|integer|bigint|smallint|decimal|number|date|timestamp|clob|blob|boolean|go|use|cascade|asc|desc';
+const MQKW='define|alter|delete|display|dis|refresh|start|stop|ping|clear|reset|resolve|set|replace|noreplace|force|noforce|purge|nopurge|all|qlocal|ql|qremote|qr|qalias|qa|qmodel|channel|chl|listener|lstr|service|namelist|nl|process|authinfo|qmgr|queue|qstatus|qs|chstatus|chs|sub|topic|authrec|chlauth|security|runmqsc|dmpmqcfg|endmqm|strmqm|crtmqm|dltmqm|dspmq|setmqaut|amqsput|amqsget|amqsbcg|for';
+const SHKW='if|then|else|elif|fi|for|do|done|while|case|esac|in|echo|cd|ls|cat|grep|egrep|awk|sed|tail|head|curl|wget|ps|kill|systemctl|service|chmod|chown|cp|mv|rm|mkdir|tar|unzip|export|sudo|su|ssh|scp|ping|telnet|nc|netstat|ss|df|du|find|test|exit|source|sleep|date|wc|sort|uniq|xargs|tee|nslookup|dig|openssl|java|set|unset|return|function';
+const mk=parts=>({re:new RegExp(parts.map(p=>'('+p[1].source+')').join('|'),'gmi'),cls:parts.map(p=>p[0])});
+const LANGS={
+ sql:mk([['cmt',R.cmtSql],['str',R.str],['kw',W(SQLKW)],['num',R.num],['var',R.vr],['fn',R.fn]]),
+ mqsc:mk([['cmt',R.cmtStar],['cmt',R.cmtHash],['str',R.str],['kw',W(MQKW)],['num',R.num],['fn',R.fn],['flag',R.flag],['path',R.url],['path',R.path]]),
+ ace:mk([['cmt',R.cmtHash],['str',R.str],['cmd',W('mqsi\\w+|ibmint|mqsiprofile')],['kw',W('deploy|apply|package|overrides|start|stop|reload|list|show|trace|import|export|' + SHKW)],['flag',R.flag],['var',R.vr],['path',R.url],['path',R.path],['num',R.num]]),
+ ini:mk([['cmt',R.cmtIni],['sect',/^[ \t]*\[[^\]\n]*\]/],['key',/^[ \t]*[\w.\- ]+?(?=[ \t]*=)/],['cmd',W('odbcinst|isql|iusql|odbc_config|odbcad32')],['str',R.str],['flag',R.flag],['var',R.vr],['path',R.url],['path',R.path],['num',R.num]]),
+ sh:mk([['cmt',R.cmtHash],['str',R.str],['cmd',W('mqsi\\w+|ibmint|runmqsc|odbcinst|isql')],['kw',W(SHKW)],['flag',R.flag],['var',R.vr],['path',R.url],['path',R.path],['num',R.num]])
+};
+const LANGNAME={sql:'SQL',mqsc:'MQSC',ace:'ACE',ini:'ODBC/INI',sh:'Shell',plain:'Plain'};
+function detect(code,k){
+  if(/\b(?:define|alter|delete|display|dis|refresh|start|stop|ping|clear|reset|resolve|set)\s+(?:qlocal|ql|qremote|qr|qalias|qa|qmodel|channel|chl|listener|lstr|service|namelist|nl|process|authinfo|qmgr|queue|q|qstatus|qs|chstatus|chs|sub|topic|authrec|chlauth|security)\b|\brunmqsc\b|\bdmpmqcfg\b|\b(?:strmqm|endmqm|crtmqm|dspmq|setmqaut|amqs\w+)\b/i.test(code))return 'mqsc';
+  if(/\bmqsi\w+|\bibmint\b|\.bar\b|\bintegration (?:node|server)\b/i.test(code))return 'ace';
+  if(/\b(?:odbcinst|isql|iusql|odbc_config|odbcad32)\b|^\s*\[[^\]\n]+\]\s*$|^\s*(?:driver|dsn|servername|hostname)\s*=/im.test(code))return 'ini';
+  if(/\b(?:select\s[\s\S]+\sfrom|insert\s+into|update\s+\S+\s+set|delete\s+from|alter\s+table|create\s+(?:or\s+replace\s+)?(?:table|index|view|procedure|function|trigger|sequence)|drop\s+(?:table|index|view)|merge\s+into|truncate\s+table|grant\s|commit\s*;)/i.test(code))return 'sql';
+  if(/^\s*(?:#!|\$\s|curl|grep|ls|cat|tail|ps|cd|echo|systemctl|service)\b|\|\s*\w+/m.test(code))return 'sh';
+  return secLang(k);
+}
+const langOf=(c,k)=>c.lang&&c.lang!=='auto'?c.lang:detect(c.code,k);
+function hlCode(code,lang){
+  const L=LANGS[lang];if(!L)return esc(code);
+  let out='',last=0,m;L.re.lastIndex=0;
+  while((m=L.re.exec(code))){
+    if(!m[0]){L.re.lastIndex++;continue}
+    let i=1;while(m[i]===undefined)i++;
+    out+=esc(code.slice(last,m.index))+`<span class="t-${L.cls[i-1]}">${esc(m[0])}</span>`;
+    last=m.index+m[0].length;
+  }
+  return out+esc(code.slice(last));
+}
+function langOpts(c,k){const a=langOf(c,k),cur=c.lang||'auto';
+  return `<option value="auto" ${cur==='auto'?'selected':''}>Auto: ${LANGNAME[a]||a}</option>`+Object.keys(LANGNAME).map(l=>`<option value="${l}" ${cur===l?'selected':''}>${LANGNAME[l]}</option>`).join('')}
+function refreshHl(cm){
+  const cur=find(sel);if(!cur)return;const k=cm.dataset.k,c=cur[1].s[k].find(x=>x.id===cm.dataset.cid);
+  cm.querySelector('pre.hl code').innerHTML=hlCode(c.code,langOf(c,k))+'\n';
+  const o=cm.querySelector('select.lang option');o.textContent='Auto: '+(LANGNAME[detect(c.code,k)]||'');
+}
+/* ---------- dialogs ---------- */
+function ask(title,fields,vals,cb,okText='Save'){
+  const f=$('#dform');
+  f.innerHTML=`<h3>${title}</h3>`+fields.map(([k,l,type,ph,opt])=>{
+    if(type==='cards')return `<label>${l}</label><div class="tcards">${ph.map(t=>`<label class="tcard"><input type="radio" name="${k}" value="${t.id}" ${(vals[k]||ph[0].id)===t.id?'checked':''}><span><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></span></label>`).join('')}</div>`;
+    if(type==='check')return `<label class="chk"><input type="checkbox" name="${k}" ${vals[k]?'checked':''}> ${l}</label>`;
+    return `<label for="f_${k}">${l}</label><input id="f_${k}" name="${k}" type="${type||'text'}" placeholder="${esc(ph||'')}" value="${esc(vals[k]||'')}" autocomplete="off" ${opt?'':'required'}>`}).join('')+`<div class="row"><button type="button" class="btn" value="x" id="dx">Cancel</button><button class="btn pri" id="dok">${okText}</button></div>`;
+  const d=$('#dlg');d.showModal();
+  $('#dx').onclick=()=>d.close();
+  f.onsubmit=e=>{const o={};fields.forEach(([k,l,type])=>{o[k]=type==='check'?f.elements[k].checked:f.elements[k].value.trim()});cb(o);d.close()};
+  setTimeout(()=>{const el=fields[0]&&f.elements[fields[0][0]];el&&el.focus&&el.focus()},30);
+}
+function sure(msg,cb){ask(msg,[],{},()=>cb(),'Confirm')}
+
+/* ---------- render ---------- */
+function hl(s){s=esc(s);if(!q)return s;return s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/[&<>"]/g,''),'ig'),m=>`<mark>${m}</mark>`)}
+function match(r,f){if(!q)return true;const h=(f.date+r.title+r.cab+(r.path||'')+r.status+r.notes+Object.values(r.s).flat().map(c=>c.label+c.code).join(' ')).toLowerCase();return h.includes(q.toLowerCase())}
+const order=r=>(r.secs||[]).map(x=>x.id);
+const secOf=(r,k)=>(r.secs||[]).find(x=>x.id===k)||{};
+const secName=(r,k)=>secOf(r,k).name||'Section';
+const toneCls=(r,k)=>({bad:'rb',ok:'val'})[secOf(r,k).tone]||'';
+const secLang=k=>{const p=sel&&find(sel);return (p&&secOf(p[1],k).lang)||'sh'};
+function stats(r){const all=order(r).filter(k=>!secOf(r,k).skip&&!(r.na&&r.na[k])).flatMap(k=>r.s[k]||[]);return [all.filter(c=>c.done).length,all.length]}
+
+function renderSide(){
+  const fs=sortedFolders();
+  let h=`<div class="top"><span>Deployment dates</span><button class="btn sm pri" data-act="newfolder" title="New release">${ic.plus} New</button></div>
+  <div class="sorts"><label>Dates<select data-act="sortd" aria-label="Sort dates"><option value="desc" ${prefs.dates==='desc'?'selected':''}>Newest first</option><option value="asc" ${prefs.dates==='asc'?'selected':''}>Oldest first</option></select></label>
+  <label>Releases<select data-act="sortr" aria-label="Sort releases" title="Manual lets you drag releases to reorder them">${[['manual','Manual (drag)'],['title','Title A to Z'],['title-desc','Title Z to A'],['cab','CAB reference'],['status','Status']].map(([v,l])=>`<option value="${v}" ${prefs.rels===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`;
+  let shown=0;
+  for(const f of fs){
+    const rs=sortedReleases(f).filter(r=>match(r,f));
+    if(q&&!rs.length)continue;shown++;
+    const isOpen=q||open[f.id]!==false;
+    h+=`<div class="folder" data-fid="${f.id}"><div class="fh" data-act="toggle" data-id="${f.id}">${ic.dir}<span class="mono">${hl(f.date)}</span><span class="n">${rs.length}</span>
+      <button class="ico" data-act="newrel" data-id="${f.id}" title="New release">${ic.plus}</button><button class="ico" data-act="editfolder" data-id="${f.id}" title="Change deployment date">${ic.edit}</button><button class="ico" data-act="delfolder" data-id="${f.id}" title="Delete folder">${ic.del}</button></div>`;
+    if(isOpen)h+=rs.map(r=>{const [d,n]=stats(r);return `<a class="rel ${sel===r.id?'on':''}" data-act="sel" data-id="${r.id}" data-rel="${r.id}" draggable="true"><b>${hl(r.title)}</b><small><span class="mono">${hl(r.cab)}</span><span class="badge s-${r.status}">${r.status}</span>${n?`<span>${d}/${n}</span>`:''}</small></a>`}).join('')||'<div class="rel" style="color:var(--mut);cursor:default">No releases</div>';
+    h+='</div>';
+  }
+  if(!shown)h+=`<div class="empty">${q?'No matches':'Click New to create your first release'}</div>`;
+  $('#side').innerHTML=h;
+}
+
+function renderView(){
+  const p=sel&&find(sel);
+  if(!p){$('#view').innerHTML=`<div class="hero"><h2>${data.folders.length?'Select or create a release':'No deployments yet'}</h2><p>Organise deployments by date, then add the release with its CAB reference and group commands as Database, MQ, ACE and Rollback.</p><button class="btn pri" data-act="newfolder">${ic.plus} New release</button></div>`;return}
+  const [f,r]=p,[d,n]=stats(r),pct=n?Math.round(d/n*100):0;
+  let h=`<div class="wrap"><div class="crumb mono">${esc(f.date)} / ${esc(r.cab)}</div>
+  <div class="title"><h2>${esc(r.title)}</h2>
+   <button class="btn" data-act="editrel">${ic.edit} Edit</button>
+   <button class="btn" data-act="dup">Duplicate</button>
+   <button class="btn" data-act="md">${ic.copy} Copy as Markdown</button>
+   <button class="btn" data-act="print">Print</button>
+   <button class="btn" data-act="exportrel">Export release</button>
+   <button class="btn dng" data-act="delrel">${ic.del} Delete</button></div>
+  <div class="meta"><span class="badge mono">CAB ${esc(r.cab)}</span>
+   <select class="st" data-act="status" aria-label="Status">${STATUS.map(s=>`<option ${s===r.status?'selected':''}>${s}</option>`).join('')}</select>
+   <div class="bar" title="${pct}%"><i style="width:${pct}%"></i></div><span style="color:var(--mut)" title="Sections marked as not counted and N/A sections are excluded">${d}/${n} commands completed</span></div>
+  <div class="path"><span style="color:var(--mut);white-space:nowrap">UAT release path</span>${r.path?`<code class="mono">${esc(r.path)}</code><button class="btn sm" data-act="copypath">${ic.copy} Copy</button>`:`<span style="color:var(--mut);flex:1">Not set. Use Edit to add the release file location.</span>`}</div>
+  <label style="font-weight:600">Notes</label>
+  <textarea class="notes" data-act="notes" placeholder="Deployment window, contacts, pre-checks...">${esc(r.notes)}</textarea>
+  <div class="tb"><span class="sp">Sections</span><button class="btn sm" data-act="addsec">${ic.plus} Add section</button><button class="btn sm" data-act="foldall" data-v="1">Collapse all</button><button class="btn sm" data-act="foldall" data-v="0">Expand all</button></div>`;
+  for(const k of order(r).filter(k=>!(r.na&&r.na[k]))){const name=esc(secName(r,k));
+    const list=r.s[k]||[],fold=r.fold&&r.fold[k];
+    h+=`<div class="box ${toneCls(r,k)} ${fold?'folded':''}" data-sec="${k}"><div class="bh" data-act="fold" data-k="${k}" title="${fold?'Expand':'Collapse'} section"><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"/></svg></span><span class="grip" draggable="true" data-drag="sec" data-act="noop" title="Drag to reorder section">${ic.grip}</span><span>${name}</span><span class="c">${list.length}</span><span class="sp"></span>
+      ${list.length?`<button class="btn sm" data-act="copyall" data-k="${k}">${ic.copy} Copy all</button>`:''}
+      <button class="btn sm" data-act="addcmd" data-k="${k}">${ic.plus} Add command</button>
+      <button class="btn sm" data-act="na" data-k="${k}" title="Mark this section as not applicable">N/A</button>
+      ${`<button class="ico" data-act="rensec" data-k="${k}" title="Edit section">${ic.edit}</button><button class="ico" data-act="delsec" data-k="${k}" title="Delete section">${ic.del}</button>`}</div>`;
+    h+=fold?'':list.length?list.map(c=>cmdHtml(c,k)).join(''):`<div class="empty">No commands in this section yet.</div>`;
+    h+='</div>';
+  }
+  const nas=order(r).filter(k=>r.na&&r.na[k]);
+  if(!r.secs.length)h+=`<div class="box"><div class="empty">This release has no sections yet.<br><br><button class="btn pri" data-act="addsec">${ic.plus} Add section</button></div></div>`;
+  else h+=`<div class="nazone"><div class="nah">Not applicable <span class="c">${nas.length}</span></div>`+(nas.length?nas.map(k=>`<div class="nachip" data-sec="${k}"><span class="grip" draggable="true" data-drag="sec" data-act="noop" title="Drag back into the list to restore">${ic.grip}</span><span>${esc(secName(r,k))}</span><button class="btn sm" data-act="na" data-k="${k}">Restore</button></div>`).join(''):'<div class="naempty">Click N/A on a section, or drag a section here. Not applicable sections are skipped in progress and exports.</div>')+'</div>';
+  $('#view').innerHTML=h+'</div>';
+}
+function cmdHtml(c,k){
+  const rows=Math.min(18,Math.max(2,c.code.split('\n').length));
+  return `<div class="cmd ${c.done?'done':''}" data-cid="${c.id}" data-k="${k}"><div class="ch"><span class="grip" draggable="true" data-drag="cmd" title="Drag to reorder">${ic.grip}</span>
+   <button class="tick ${c.done?'on':''}" data-act="done" aria-pressed="${!!c.done}" title="${c.done?'Completed'+(c.doneAt?' at '+new Date(c.doneAt).toLocaleString():'')+'. Click to undo':'Mark as completed'}" aria-label="Mark as completed">${c.done?ic.ok:ic.circ}</button>
+   <input class="lbl" data-act="label" value="${esc(c.label)}" placeholder="Describe this step" aria-label="Label">
+   <select class="lang" data-act="lang" title="Syntax highlighting" aria-label="Syntax">${langOpts(c,k)}</select>
+   <button class="btn sm" data-act="copy">${ic.copy} Copy</button>
+   <button class="ico" data-act="up" title="Move up">&#9650;</button><button class="ico" data-act="down" title="Move down">&#9660;</button>
+   <button class="ico" data-act="delcmd" title="Delete">${ic.del}</button></div>
+   <div class="ed"><pre class="hl mono" aria-hidden="true"><code>${hlCode(c.code,langOf(c,k))}\n</code></pre><textarea class="code mono" data-act="code" rows="${rows}" wrap="off" spellcheck="false" placeholder="Paste command here">${esc(c.code)}</textarea></div></div>`;
+}
+function render(){renderSide();renderView()}
+
+/* ---------- actions ---------- */
+const MD_LANG={sql:'sql',ace:'bash',ini:'ini',sh:'bash'};
+function summary(r){
+  const secs=order(r).filter(k=>!(r.na&&r.na[k])).map(k=>{const list=r.s[k]||[];
+    return {k,name:secName(r,k),list,done:list.filter(c=>c.done).length,counted:!secOf(r,k).skip}});
+  const [d,n]=stats(r);
+  return {secs,d,n,pct:n?Math.round(d/n*100):0,excl:(r.secs||[]).filter(x=>x.skip&&!(r.na&&r.na[x.id])).map(x=>x.name)};
+}
+const secState=x=>!x.list.length?'No commands':x.done===x.list.length?'Completed':x.done?'In progress':'Pending';
+function toMarkdown(f,r){
+  const S=summary(r);
+  let m=`# ${r.title}\n\n- **Deployment date:** ${f.date}\n- **CAB reference:** ${r.cab}\n- **UAT release path:** ${r.path||'n/a'}\n- **Status:** ${r.status}\n- **Progress:** ${S.d}/${S.n} commands completed (${S.pct}%)${S.excl.length?', excluding '+S.excl.join(', '):''}\n`;
+  if(r.notes)m+=`\n> ${r.notes.replace(/\n/g,'\n> ')}\n`;
+  S.secs.forEach(x=>{
+    m+=`\n## ${x.name}\n`;
+    x.list.forEach(c=>{m+=`\n### [${c.done?'x':' '}] ${c.label||'Untitled'}\n\`\`\`${MD_LANG[langOf(c,x.k)]||''}\n${c.code}\n\`\`\`\n`});
+    if(!x.list.length)m+='\n_None_\n';
+  });
+  return m;
+}
+function toPrintHtml(f,r){
+  const S=summary(r);
+  return `<h1>${esc(r.title)}</h1>
+  <table class="pm"><tr><th>Deployment date</th><td>${esc(f.date)}</td><th>CAB reference</th><td>${esc(r.cab)}</td></tr>
+  <tr><th>UAT release path</th><td colspan="3">${esc(r.path||'n/a')}</td></tr>
+  <tr><th>Status</th><td>${esc(r.status)}</td><th>Progress</th><td>${S.d}/${S.n} completed (${S.pct}%)<div class="pbar"><i style="width:${S.pct}%"></i></div>${S.excl.length?`<small>Excludes ${esc(S.excl.join(', '))}</small>`:''}</td></tr></table>
+  ${r.notes?`<p class="pn">${esc(r.notes).replace(/\n/g,'<br>')}</p>`:''}`
+  +S.secs.map(x=>`<h2>${esc(x.name)} <span>${secState(x)} (${x.done}/${x.list.length})${x.counted?'':', not counted in progress'}</span></h2>`
+    +(x.list.map(c=>`<div class="pc"><div class="pl"><b>${c.done?'&#9745;':'&#9744;'}</b> ${esc(c.label||'Untitled')}</div><pre>${hlCode(c.code,langOf(c,x.k))}</pre></div>`).join('')||'<p><i>None</i></p>')).join('')
+  +`<p class="pf">Printed ${new Date().toLocaleString()}</p>`;
+}
+function newRelease(date){
+  ask('New release',[['title','Release title','text','e.g. Payments API v2.4.0'],['cab','CAB approval reference','text','e.g. CHG0012345'],['date','Deployment date','date'],['path','UAT release file path','text','e.g. /opt/releases/UAT/PaymentsAPI_2.4.0/',true],['tpl','Template','cards',TEMPLATES]],{tpl:lastTpl,date},o=>{
+    let f=data.folders.find(x=>x.date===o.date);if(!f){f={id:uid(),date:o.date,releases:[]};data.folders.push(f)}
+    const tpl=TEMPLATES.find(t=>t.id===o.tpl)||TEMPLATES[0];lastTpl=tpl.id;try{localStorage.setItem(TPLKEY,tpl.id)}catch(e){}
+    const secs=tpl.sections.map(x=>({id:'s'+uid(),name:x.name,lang:x.lang||'',skip:!!x.skip,tone:x.tone||''})),sc={};secs.forEach(x=>sc[x.id]=[]);
+    const r={id:uid(),title:o.title,cab:o.cab,path:o.path,status:'Draft',notes:'',secs,s:sc,fold:{},na:{}};
+    f.releases.push(r);sel=r.id;open[f.id]=true;save();render();
+  },'Create');
+}
+function showLog(){
+  const d=$('#logdlg');
+  d.querySelector('.logbox').innerHTML=`<h3>Change log</h3><p style="color:var(--mut);margin:0">Current version <b class="mono">v${APP_VERSION}</b></p>`
+   +CHANGELOG.map((x,i)=>`<div class="ver-item"><h4><span class="mono">v${esc(x.v)}</span>${i===0?'<span class="badge s-Deployed">Latest</span>':''}${x.date?`<small>${esc(x.date)}</small>`:''}</h4><ul>${x.changes.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`).join('')
+   +'<div class="row"><button class="btn pri" id="logx">Close</button></div>';
+  $('#logx').onclick=()=>d.close();d.showModal();
+}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el||el.matches('input:not([type=checkbox]),textarea,select'))return;
+  const a=el.dataset.act,id=el.dataset.id;
+  const cm=el.closest('[data-cid]');
+  const cur=sel&&find(sel);
+  const cmd=cm&&cur?cur[1].s[cm.dataset.k].find(c=>c.id===cm.dataset.cid):null;
+  switch(a){
+   case 'changelog':showLog();break;
+   case 'menu':$('#side').classList.toggle('open');break;
+   case 'theme':{const dark=getComputedStyle(document.body).backgroundColor==='rgb(13, 17, 23)';const n=dark?'light':'dark';document.documentElement.dataset.theme=n;localStorage.setItem(THEME,n);break}
+   case 'exportrel':download(`release_${cur[1].title.replace(/[^\w.-]+/g,'_')}_${cur[0].date}.json`,JSON.stringify({appVersion:APP_VERSION,app:'release-snippets',kind:'release',version:1,date:cur[0].date,release:cur[1]},null,2),'application/json');toast('Release exported');break;
+   case 'export':download(`release-snippets-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({appVersion:APP_VERSION,...data},null,2),'application/json');toast('Exported JSON');break;
+   case 'import':$('#file').click();break;
+   case 'newfolder':newRelease((cur&&cur[0].date)||new Date().toISOString().slice(0,10));break;
+   case 'toggle':open[id]=!(open[id]!==false);renderSide();break;
+   case 'editfolder':e.stopPropagation();{const f=data.folders.find(x=>x.id===id);ask('Change deployment date',[['date','Deployment date','date']],f,o=>{const t=data.folders.find(x=>x.date===o.date&&x.id!==f.id);if(t){t.releases.push(...f.releases);data.folders=data.folders.filter(x=>x!==f);open[t.id]=true;toast('Merged into existing '+o.date)}else f.date=o.date;save();render()})}break;
+   case 'delfolder':e.stopPropagation();{const f=data.folders.find(x=>x.id===id);sure(`Delete ${f.date} and its ${f.releases.length} release(s)?`,()=>{data.folders=data.folders.filter(x=>x.id!==id);if(sel&&!find(sel))sel=null;save();render()})}break;
+   case 'newrel':e.stopPropagation();newRelease(data.folders.find(x=>x.id===id).date);break;
+   case 'sel':sel=id;$('#side').classList.remove('open');render();break;
+   case 'editrel':ask('Edit release',[['title','Release title'],['cab','CAB approval reference'],['date','Deployment date','date'],['path','UAT release file path','text','Folder or file location of the release package',true]],{...cur[1],date:cur[0].date},o=>{const {date,...rest}=o;Object.assign(cur[1],rest);if(date&&date!==cur[0].date){let t=data.folders.find(x=>x.date===date);if(!t){t={id:uid(),date,releases:[]};data.folders.push(t)}cur[0].releases=cur[0].releases.filter(x=>x!==cur[1]);t.releases.push(cur[1]);open[t.id]=true;toast('Moved to '+date)}save();render()});break;
+   case 'dup':{const c=JSON.parse(JSON.stringify(cur[1]));c.id=uid();c.title+=' (copy)';c.status='Draft';c.cab='';Object.values(c.s).flat().forEach(x=>{x.id=uid();x.done=false});ask('Duplicate release',[['cab','New CAB reference']],{},o=>{c.cab=o.cab;cur[0].releases.push(c);sel=c.id;save();render()},'Duplicate')}break;
+   case 'delrel':sure(`Delete release "${cur[1].title}"?`,()=>{cur[0].releases=cur[0].releases.filter(x=>x.id!==cur[1].id);sel=null;save();render()});break;
+   case 'copypath':copy(cur[1].path);break;
+   case 'fold':{const k=el.dataset.k;cur[1].fold=cur[1].fold||{};cur[1].fold[k]=!cur[1].fold[k];save();render()}break;
+   case 'foldall':{cur[1].fold={};if(el.dataset.v==='1')order(cur[1]).forEach(k=>cur[1].fold[k]=true);save();render()}break;
+   case 'done':if(cmd){cmd.done=!cmd.done;cmd.doneAt=cmd.done?Date.now():null;save();render()}break;
+   case 'na':{const k=el.dataset.k;cur[1].na=cur[1].na||{};cur[1].na[k]=!cur[1].na[k];save();render()}break;
+   case 'print':$('#pa').innerHTML=toPrintHtml(...cur);window.print();break;
+   case 'addsec':ask('New section',[['name','Section name','text','e.g. Pre-checks, Config files'],['count','Count its commands in the progress indicator','check']],{count:true},o=>{const R=cur[1],id='s'+uid();R.secs.push({id,name:o.name,lang:'',skip:!o.count,tone:''});R.s[id]=[];save();render()},'Create');break;
+   case 'rensec':{const R=cur[1],k=el.dataset.k,x=secOf(R,k);ask('Edit section',[['name','Section name'],['count','Count its commands in the progress indicator','check']],{name:x.name,count:!x.skip},o=>{x.name=o.name;x.skip=!o.count;save();render()})}break;
+   case 'delsec':{const R=cur[1],k=el.dataset.k,n=(R.s[k]||[]).length;sure(`Delete section "${secName(R,k)}" and its ${n} command(s)?`,()=>{R.secs=R.secs.filter(x=>x.id!==k);delete R.s[k];if(R.na)delete R.na[k];if(R.fold)delete R.fold[k];save();render()})}break;
+   case 'md':copy(toMarkdown(...cur));break;
+   case 'addcmd':{const c={id:uid(),label:'',code:'',done:false};(cur[1].s[el.dataset.k]||(cur[1].s[el.dataset.k]=[])).push(c);if(cur[1].fold)cur[1].fold[el.dataset.k]=false;save();render();const t=document.querySelector(`[data-cid="${c.id}"] .lbl`);t&&t.focus()}break;
+   case 'copyall':copy((cur[1].s[el.dataset.k]||[]).map(c=>c.code).join('\n\n'));break;
+   case 'copy':copy(cm.querySelector('textarea').value);break;
+   case 'delcmd':{const l=cur[1].s[cm.dataset.k];l.splice(l.indexOf(cmd),1);save();render()}break;
+   case 'up':case 'down':{const l=cur[1].s[cm.dataset.k],i=l.indexOf(cmd),j=a==='up'?i-1:i+1;if(j>=0&&j<l.length){[l[i],l[j]]=[l[j],l[i]];save();render()}}break;
+  }
+});
+document.addEventListener('change',e=>{
+  const el=e.target,a=el.dataset.act;if(!a)return;
+  if(a==='sortd'){prefs.dates=el.value;savePrefs();renderSide();return}
+  if(a==='sortr'){prefs.rels=el.value;savePrefs();renderSide();return}
+  const cur=sel&&find(sel);if(!cur)return;
+  if(a==='status'){cur[1].status=el.value;save();render()}
+  if(a==='lang'){const cm=el.closest('[data-cid]');const c=cur[1].s[cm.dataset.k].find(c=>c.id===cm.dataset.cid);c.lang=el.value;save();refreshHl(cm);return}
+  if(a==='done'){const cm=el.closest('[data-cid]');cur[1].s[cm.dataset.k].find(c=>c.id===cm.dataset.cid).done=el.checked;save();render()}
+});
+document.addEventListener('input',e=>{
+  const el=e.target,a=el.dataset.act;if(!a)return;
+  const cur=sel&&find(sel);if(!cur)return;
+  if(a==='notes'){cur[1].notes=el.value;save();return}
+  const cm=el.closest('[data-cid]');if(!cm)return;
+  const c=cur[1].s[cm.dataset.k].find(c=>c.id===cm.dataset.cid);
+  if(a==='label')c.label=el.value;
+  if(a==='code'){c.code=el.value;el.rows=Math.min(18,Math.max(2,el.value.split('\n').length));refreshHl(cm)}
+  save();
+});
+window.addEventListener('afterprint',()=>{$('#pa').innerHTML=''});
+document.addEventListener('scroll',e=>{const t=e.target;if(t.matches&&t.matches('textarea.code')){const p=t.previousElementSibling;p.scrollTop=t.scrollTop;p.scrollLeft=t.scrollLeft}},true);
+/* ---------- drag and drop ---------- */
+let drag=null;
+const clearOv=()=>document.querySelectorAll('.ov-t,.ov-b,.ov-in').forEach(n=>n.classList.remove('ov-t','ov-b','ov-in'));
+function dropTarget(e){
+  const t=e.target.nodeType===1?e.target:e.target.parentElement;if(!t)return null;
+  if(drag.type==='rel'){
+    const rl=t.closest('.rel[data-rel]');
+    if(rl&&rl.dataset.rel!==drag.id&&prefs.rels==='manual'){const r=rl.getBoundingClientRect();return{el:rl,rid:rl.dataset.rel,after:e.clientY>r.top+r.height/2}}
+    const fo=t.closest('.folder');
+    if(fo&&fo.dataset.fid&&find(drag.id)[0].id!==fo.dataset.fid)return{el:fo.querySelector('.fh'),fid:fo.dataset.fid,inside:true};
+    return null;
+  }
+  if(drag.type==='sec'){const z=t.closest('.nazone');if(z)return drag.na?null:{el:z,na:true,inside:true};const b=t.closest('.box');if(!b||b.dataset.sec===drag.k)return null;const r=b.getBoundingClientRect();return{el:b,k:b.dataset.sec,after:e.clientY>r.top+r.height/2}}
+  const c=t.closest('.cmd');
+  if(c){if(c.dataset.cid===drag.cid)return null;const r=c.getBoundingClientRect();return{el:c,k:c.dataset.k,cid:c.dataset.cid,after:e.clientY>r.top+r.height/2}}
+  const b=t.closest('.box');
+  return b?{el:b,k:b.dataset.sec,inside:true}:null;
+}
+document.addEventListener('dragstart',e=>{
+  const rl=e.target.closest&&e.target.closest('.rel[data-rel]');
+  if(rl){drag={type:'rel',id:rl.dataset.rel};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','rel');setTimeout(()=>rl.classList.add('dragging'),0);return}
+  const g=e.target.closest&&e.target.closest('[data-drag]');if(!g)return;
+  const node=g.closest(g.dataset.drag==='cmd'?'.cmd':'.box,.nachip');
+  drag={type:g.dataset.drag,k:node.dataset.k||node.dataset.sec,cid:node.dataset.cid,na:!!node.closest('.nazone')};
+  e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',drag.type);e.dataTransfer.setDragImage(node,16,16);
+  setTimeout(()=>node.classList.add('dragging'),0);
+});
+document.addEventListener('dragover',e=>{
+  if(!drag)return;clearOv();const d=dropTarget(e);if(!d)return;
+  e.preventDefault();e.dataTransfer.dropEffect='move';
+  d.el.classList.add(d.inside?'ov-in':d.after?'ov-b':'ov-t');
+});
+document.addEventListener('drop',e=>{
+  if(!drag)return;const d=dropTarget(e);if(!d)return;e.preventDefault();
+  if(drag.type==='rel'){moveRel(drag.id,d);drag=null;save();render();return}
+  const cur=find(sel)[1];
+  if(drag.type==='sec'){cur.na=cur.na||{};if(d.na)cur.na[drag.k]=true;else{const mv=cur.secs.find(x=>x.id===drag.k),rest=cur.secs.filter(x=>x!==mv);rest.splice(rest.findIndex(x=>x.id===d.k)+(d.after?1:0),0,mv);cur.secs=rest;cur.na[drag.k]=false}}
+  else{
+    const src=cur.s[drag.k],[c]=src.splice(src.findIndex(x=>x.id===drag.cid),1);
+    const dst=cur.s[d.k]||(cur.s[d.k]=[]);
+    dst.splice(d.inside?dst.length:dst.findIndex(x=>x.id===d.cid)+(d.after?1:0),0,c);
+  }
+  drag=null;save();render();
+});
+document.addEventListener('dragend',()=>{drag=null;clearOv();document.querySelectorAll('.dragging').forEach(n=>n.classList.remove('dragging'))});
+$('#q').addEventListener('input',e=>{q=e.target.value.trim();renderSide()});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}});
+const IMPORT_MODES=[
+ {id:'append',name:'Append to existing data',desc:'Keep everything already here and add the imported release(s). Matching deployment dates are merged into the same folder.'},
+ {id:'replace',name:'Clear all existing data and import as fresh',desc:'Deletes all current deployment dates and releases first. Export a backup if unsure.'}];
+function readImport(d){
+  let folders;
+  if(d&&d.kind==='release'&&d.release&&typeof d.release==='object')folders=[{date:d.date||new Date().toISOString().slice(0,10),releases:[d.release]}];
+  else if(d&&Array.isArray(d.folders))folders=d.folders;
+  else return null;
+  if(!folders.every(f=>f&&typeof f.date==='string'&&Array.isArray(f.releases)&&f.releases.every(r=>r&&typeof r.title==='string')))return null;
+  folders=migrate({folders:JSON.parse(JSON.stringify(folders))}).folders;
+  const n=folders.reduce((a,f)=>a+f.releases.length,0);
+  return {folders,n,label:d.kind==='release'?`release "${d.release.title}"`:`backup (${folders.length} date folder${folders.length===1?'':'s'}, ${n} release${n===1?'':'s'})`};
+}
+function applyImport(pk,mode){
+  let first=null;
+  if(mode==='replace'){
+    data={folders:pk.folders.map(f=>({id:f.id||uid(),date:f.date,releases:f.releases.map(r=>({...r,id:r.id||uid()}))}))};open={};
+    first=data.folders[0]&&data.folders[0].releases[0];
+  }else{
+    for(const f of pk.folders){
+      let t=data.folders.find(x=>x.date===f.date);if(!t){t={id:uid(),date:f.date,releases:[]};data.folders.push(t)}
+      for(const r of f.releases){r.id=uid();t.releases.push(r);first=first||r}open[t.id]=true;
+    }
+  }
+  sel=first?first.id:null;save();render();toast(mode==='replace'?'Imported as fresh data':'Imported and appended');
+}
+$('#file').addEventListener('change',e=>{
+  const fl=e.target.files[0];if(!fl)return;
+  const rd=new FileReader();rd.onload=()=>{
+    let pk=null;try{pk=readImport(JSON.parse(rd.result))}catch(x){}
+    if(!pk)return toast('Not a valid Release Snippets file');
+    ask('Import '+esc(pk.label),[['mode','How should it be imported?','cards',IMPORT_MODES]],{mode:'append'},o=>applyImport(pk,o.mode),'Import');
+  };
+  rd.readAsText(fl);e.target.value='';
+});
+try{const th=localStorage.getItem(THEME);if(th)document.documentElement.dataset.theme=th}catch(e){}
+{const f0=sortedFolders()[0],r0=f0&&sortedReleases(f0)[0];if(r0)sel=r0.id}
+$('#vbadge').textContent='v'+APP_VERSION;document.querySelectorAll('.vtxt').forEach(e=>e.textContent=APP_VERSION);
+render();
+</script>
+</body>
+</html>

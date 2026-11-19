@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habib AlMawali | Tools &amp; Applications</title>
+<meta name="description" content="Showcase of internal tools and applications developed by Habib AlMawali.">
+
+<style>
+/* =========================================================
+   THEME TOKENS
+   ========================================================= */
+:root {
+  --bg: #070b16;
+  --bg-2: #0d1426;
+  --surface: rgba(255,255,255,.055);
+  --surface-strong: rgba(255,255,255,.09);
+  --border: rgba(255,255,255,.12);
+  --text: #eaf0ff;
+  --muted: #9aa7c7;
+  --accent: #4f8cff;
+  --accent-2: #a45cff;
+  --accent-3: #22d3b6;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.7);
+  --radius: 22px;
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+[data-theme="light"] {
+  --bg: #f3f6fd;
+  --bg-2: #e7edfb;
+  --surface: rgba(255,255,255,.75);
+  --surface-strong: rgba(255,255,255,.95);
+  --border: rgba(20,40,90,.12);
+  --text: #0e1730;
+  --muted: #55638a;
+  --shadow: 0 20px 45px -22px rgba(30,60,140,.35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.55;
+  transition: background .4s, color .4s;
+}
+
+/* =========================================================
+   ANIMATED BACKGROUND
+   ========================================================= */
+.bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background:
+      radial-gradient(1200px 700px at 80% -10%, var(--bg-2), transparent 60%), var(--bg); }
+.blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .45; animation: float 18s ease-in-out infinite; }
+.blob.b1 { width: 480px; height: 480px; background: var(--accent);   top: -120px; left: -100px; }
+.blob.b2 { width: 420px; height: 420px; background: var(--accent-2); bottom: -140px; right: -80px; animation-delay: -6s; }
+.blob.b3 { width: 320px; height: 320px; background: var(--accent-3); top: 45%; left: 55%; opacity: .25; animation-delay: -11s; }
+[data-theme="light"] .blob { opacity: .28; }
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center, #000 20%, transparent 75%);
+  opacity: .35;
+}
+@keyframes float {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%     { transform: translate(60px,40px) scale(1.08); }
+  66%     { transform: translate(-40px,70px) scale(.95); }
+}
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.wrap { width: min(1180px, 92%); margin-inline: auto; }
+
+/* NAV */
+nav {
+  position: sticky; top: 14px; z-index: 20;
+  margin-top: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; }
+.brand-mark {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 6px 18px -6px var(--accent);
+}
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface-strong);
+  color: var(--text); cursor: pointer; display: grid; place-items: center;
+  transition: transform .25s, border-color .25s;
+}
+.icon-btn:hover { transform: rotate(18deg) scale(1.08); border-color: var(--accent); }
+.icon-btn svg { width: 19px; height: 19px; }
+
+/* HERO */
+.hero { text-align: center; padding: 86px 0 46px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border);
+}
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-3); box-shadow: 0 0 0 0 var(--accent-3); animation: pulse 2s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+h1 {
+  margin: 22px auto 16px; max-width: 880px;
+  font-size: clamp(2.2rem, 6vw, 4.2rem); line-height: 1.07; letter-spacing: -1.5px; font-weight: 800;
+}
+.gradient-text {
+  background: linear-gradient(100deg, var(--accent), var(--accent-2) 50%, var(--accent-3));
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shine 6s linear infinite;
+}
+@keyframes shine { to { background-position: 200% center; } }
+.hero p.lead { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 1.12rem; }
+.typed-line { margin-top: 18px; min-height: 28px; color: var(--accent-3); font-weight: 600; font-family: "Cascadia Code", Consolas, monospace; font-size: .98rem; }
+.caret { display: inline-block; width: 2px; height: 1.05em; background: var(--accent-3); margin-left: 3px; vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.stats { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 38px; }
+.stat {
+  min-width: 150px; padding: 16px 22px; border-radius: 18px;
+  background: var(--surface); border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.stat b { display: block; font-size: 1.8rem; font-weight: 800; }
+.stat span { font-size: .82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* TOOLBAR */
+.toolbar {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  margin: 30px 0 22px;
+}
+.section-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -.4px; }
+.section-title small { display: block; font-size: .88rem; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+.controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.search {
+  position: relative;
+}
+.search input {
+  width: 240px; max-width: 100%;
+  padding: 11px 16px 11px 40px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  font: inherit; font-size: .93rem; outline: none; transition: border-color .25s, box-shadow .25s;
+}
+.search input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+.search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--muted); }
+.pill-btn {
+  padding: 11px 18px; border-radius: 999px; font: inherit; font-size: .9rem; font-weight: 600;
+  color: var(--text); background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+  transition: transform .2s, border-color .2s, background .2s;
+}
+.pill-btn:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--surface-strong); }
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+.cards {
+  display: grid; gap: 24px; align-items: start;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  padding-bottom: 70px;
+}
+.card {
+  --mx: 50%; --my: 50%;
+  position: relative; padding: 26px; border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--border);
+  backdrop-filter: blur(16px) saturate(130%); -webkit-backdrop-filter: blur(16px) saturate(130%);
+  box-shadow: var(--shadow);
+  transform-style: preserve-3d;
+  transition: transform .25s ease, border-color .3s, box-shadow .3s;
+  opacity: 0; transform: translateY(28px);
+  animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards;
+  overflow: hidden;
+}
+@keyframes rise { to { opacity: 1; transform: translateY(0); } }
+.card::before { /* spotlight following the cursor */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(380px circle at var(--mx) var(--my), color-mix(in srgb, var(--c1) 26%, transparent), transparent 60%);
+}
+.card:hover::before { opacity: 1; }
+.card::after { /* gradient top edge */
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, var(--c1), var(--c2));
+}
+.card:hover { border-color: color-mix(in srgb, var(--c1) 60%, var(--border)); }
+.card.hidden { display: none; }
+
+.card-head { display: flex; align-items: center; gap: 16px; position: relative; }
+.card-icon {
+  flex: none; width: 58px; height: 58px; border-radius: 17px; display: grid; place-items: center; color: #fff;
+  background: linear-gradient(135deg, var(--c1), var(--c2));
+  box-shadow: 0 12px 26px -10px var(--c1);
+  transition: transform .4s cubic-bezier(.3,1.6,.5,1);
+}
+.card:hover .card-icon { transform: scale(1.1) rotate(-6deg); }
+.card-icon svg { width: 28px; height: 28px; }
+.card-title h3 { font-size: 1.28rem; letter-spacing: -.3px; line-height: 1.2; }
+.card-title .tag {
+  display: inline-block; margin-top: 5px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--c1); padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--c1) 14%, transparent);
+}
+.tagline { margin-top: 16px; color: var(--muted); font-size: .98rem; position: relative; }
+
+/* Foldable description */
+.toggle {
+  margin-top: 18px; width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-radius: 14px; cursor: pointer; font: inherit; font-weight: 600; font-size: .93rem;
+  color: var(--text); background: var(--surface-strong); border: 1px solid var(--border);
+  transition: border-color .2s, background .2s; position: relative;
+}
+.toggle:hover { border-color: var(--c1); }
+.toggle:focus-visible, .launch:focus-visible, .pill-btn:focus-visible, .icon-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.chev { width: 20px; height: 20px; transition: transform .35s cubic-bezier(.3,1.4,.5,1); color: var(--c1); }
+.toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+.panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.2,.8,.2,1); position: relative; }
+.panel.open { grid-template-rows: 1fr; }
+.panel-inner { overflow: hidden; }
+.panel-body { padding: 18px 4px 4px; opacity: 0; transform: translateY(-8px); transition: opacity .4s .05s, transform .4s .05s; }
+.panel.open .panel-body { opacity: 1; transform: none; }
+.panel-body p { color: var(--muted); font-size: .96rem; margin-bottom: 14px; }
+.panel-body ul { list-style: none; display: grid; gap: 9px; margin-bottom: 6px; }
+.panel-body li { display: flex; gap: 10px; font-size: .93rem; }
+.panel-body li::before {
+  content: ""; flex: none; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%;
+  background: color-mix(in srgb, var(--c1) 20%, transparent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3b6' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/11px no-repeat;
+}
+
+.launch {
+  margin-top: 18px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 18px; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: .98rem; color: #fff;
+  background: linear-gradient(120deg, var(--c1), var(--c2)); position: relative; overflow: hidden;
+  box-shadow: 0 14px 28px -14px var(--c1); transition: transform .2s, box-shadow .2s;
+}
+.launch:hover { transform: translateY(-3px); box-shadow: 0 20px 34px -14px var(--c1); }
+.launch svg { width: 18px; height: 18px; transition: transform .25s; }
+.launch:hover svg { transform: translate(3px,-3px); }
+.launch::after { /* sheen */
+  content: ""; position: absolute; top: 0; bottom: 0; width: 60px; left: -90px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); transform: skewX(-20deg);
+}
+.launch:hover::after { animation: sheen .8s; }
+@keyframes sheen { to { left: 120%; } }
+
+.empty { display: none; text-align: center; color: var(--muted); padding: 40px 0 80px; }
+.empty.show { display: block; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 30px 0 40px; text-align: center; color: var(--muted); font-size: .95rem; }
+.dev-label {
+  display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); font-weight: 600; color: var(--text);
+}
+.dev-label b { background: linear-gradient(100deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dev-label svg { width: 18px; height: 18px; color: var(--accent); }
+footer small { display: block; margin-top: 12px; }
+
+/* VERSION + CHANGELOG */
+.ver-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface-strong); color: var(--text);
+  font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; transition: transform .2s, border-color .2s;
+}
+.ver-btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+.ver-btn .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-3); }
+.ver-btn:focus-visible, .modal-close:focus-visible, .link-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.ver {
+  display: inline-block; margin-left: 6px; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--muted); font-family: "Cascadia Code", Consolas, monospace;
+}
+.log { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
+.log h4 { font-size: .76rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px; }
+.log-entry { margin-bottom: 12px; }
+.log-entry-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.log-entry-head b { font-family: "Cascadia Code", Consolas, monospace; font-size: .9rem; color: var(--c1, var(--accent)); }
+.log-entry-head span { font-size: .78rem; color: var(--muted); }
+.chg { display: flex; gap: 10px; align-items: baseline; font-size: .9rem; color: var(--muted); margin-bottom: 5px; }
+.chg-type {
+  flex: none; min-width: 66px; text-align: center; font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .8px;
+  padding: 2px 8px; border-radius: 6px;
+}
+.chg-type.new      { color: #22d3b6; background: rgba(34,211,182,.14); }
+.chg-type.improved { color: #4f8cff; background: rgba(79,140,255,.14); }
+.chg-type.fixed    { color: #ffb020; background: rgba(255,176,32,.16); }
+.chg-type.removed  { color: #ff5c7a; background: rgba(255,92,122,.14); }
+
+dialog { border: none; padding: 0; background: transparent; color: var(--text); width: min(640px, 92vw); margin: auto; }
+dialog::backdrop { background: rgba(3,6,15,.65); backdrop-filter: blur(6px); }
+.modal {
+  position: relative; max-height: 80vh; overflow: auto; padding: 30px 30px 24px; border-radius: var(--radius);
+  background: var(--bg-2); border: 1px solid var(--border); box-shadow: var(--shadow);
+  animation: rise .35s cubic-bezier(.2,.8,.2,1) both;
+}
+.modal h2 { font-size: 1.5rem; letter-spacing: -.4px; }
+.modal .sub { color: var(--muted); font-size: .92rem; margin: 4px 0 22px; }
+.modal-close {
+  position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-strong); color: var(--text); font-size: 1.1rem; line-height: 1;
+}
+.timeline { border-left: 2px solid var(--border); padding-left: 22px; margin-left: 6px; }
+.timeline .log-entry { position: relative; margin-bottom: 22px; }
+.timeline .log-entry::before {
+  content: ""; position: absolute; left: -29px; top: 5px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.timeline .log-entry-head b { font-size: 1.05rem; color: var(--text); }
+.link-btn { background: none; border: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+/* FLAGS + FILTERS */
+.flags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; position: relative; }
+.flag {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 9px; border-radius: 999px;
+  font-size: .74rem; font-weight: 700; color: var(--f);
+  background: color-mix(in srgb, var(--f) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--f) 35%, transparent);
+  cursor: help;
+}
+.flag svg { width: 13px; height: 13px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 22px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: .84rem; font-weight: 600; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border); transition: all .2s;
+}
+.chip svg { width: 14px; height: 14px; }
+.chip:hover { color: var(--text); border-color: var(--accent); }
+.chip.active { color: #fff; background: linear-gradient(120deg, var(--accent), var(--accent-2)); border-color: transparent; }
+.chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.chip .n { font-size: .72rem; opacity: .75; }
+.src-link {
+  margin-top: 10px; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 16px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: .9rem;
+  color: var(--text); background: var(--surface-strong); border: 1px solid var(--border); position: relative;
+  transition: border-color .2s, transform .2s;
+}
+.src-link:hover { border-color: var(--c1); transform: translateY(-2px); }
+.src-link svg { width: 16px; height: 16px; }
+
+/* ACCESS DIALOG */
+.acc-icon {
+  width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; margin-bottom: 16px; color: #fff;
+  background: linear-gradient(135deg, #ff5c7a, #ff9a5c); box-shadow: 0 14px 30px -12px #ff5c7a;
+}
+.acc-icon svg { width: 30px; height: 30px; }
+.acc-msg { color: var(--muted); margin: 8px 0 20px; }
+.acc-sub { font-size: .76rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin: 18px 0 10px; }
+.crit { display: flex; gap: 10px; font-size: .94rem; margin-bottom: 8px; }
+.crit::before { content: "\2713"; flex: none; color: var(--accent-3); font-weight: 800; }
+.contact-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border); margin-bottom: 14px;
+}
+.contact-card .av {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.contact-card small { display: block; color: var(--muted); }
+.acc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.acc-actions a {
+  flex: 1 1 160px; text-align: center; padding: 12px 16px; border-radius: 14px; font-weight: 700; font-size: .93rem;
+  text-decoration: none; color: #fff; background: linear-gradient(120deg, var(--accent), var(--accent-2));
+}
+.acc-actions a.alt { color: var(--text); background: var(--surface-strong); border: 1px solid var(--border); }
+.acc-actions a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* TOAST */
+.toast {
+  position: fixed; left: 50%; bottom: 30px; transform: translate(-50%, 30px); opacity: 0; pointer-events: none;
+  padding: 13px 22px; border-radius: 14px; font-weight: 600; font-size: .93rem;
+  background: var(--text); color: var(--bg); box-shadow: 0 18px 40px -12px rgba(0,0,0,.5);
+  transition: opacity .3s, transform .3s; z-index: 50;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  .hero { padding-top: 56px; }
+  .search input { width: 100%; }
+  .search { flex: 1 1 100%; }
+  .brand span.name { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .card { opacity: 1; transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="bg" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="grid-overlay"></div>
+</div>
+
+<div class="wrap">
+  <!-- NAV -->
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">HM</div>
+      <span class="name">Habib AlMawali</span>
+    </div>
+    <div class="nav-actions">
+      <button class="ver-btn" id="verBtn" aria-haspopup="dialog" title="View changelog">
+        <span class="dot"></span><span>v<span class="siteVer"></span></span><span style="color:var(--muted);font-weight:600">Changelog</span>
+      </button>
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle light / dark theme" title="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="badge"><span class="dot"></span> On-Prem Tools Portal</div>
+    <h1>Tools &amp; applications <span class="gradient-text">built with purpose.</span></h1>
+    <p class="lead">A curated collection of internal tools designed to simplify daily work, speed up delivery and make operations a little more enjoyable.</p>
+    <div class="typed-line" aria-live="off"><span id="typed"></span><span class="caret"></span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="statTools">0</b><span>Tools live</span></div>
+      <div class="stat"><b>100%</b><span>On-premise</span></div>
+      <div class="stat"><b id="statNext">+</b><span>More coming</span></div>
+    </div>
+  </header>
+
+  <!-- TOOLBAR -->
+  <section id="tools">
+    <div class="toolbar">
+      <div class="section-title">Developed tools<small>Click a card to read more, then launch the tool.</small></div>
+      <div class="controls">
+        <label class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="Search tools..." aria-label="Search tools">
+        </label>
+        <button class="pill-btn" id="expandAll">Expand all</button>
+        <button class="pill-btn" id="collapseAll">Collapse all</button>
+      </div>
+    </div>
+
+    <div class="filters" id="filters" role="group" aria-label="Filter tools by flag"></div>
+    <div class="cards" id="cards"></div>
+    <div class="empty" id="empty">No tools match your search.</div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="dev-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+      <span>Developed by <b>Habib AlMawali</b></span>
+    </div>
+    <small>Version <span class="siteVer"></span> &middot; Last updated <span id="siteDate"></span> &middot; <button class="link-btn" id="verBtn2">View changelog</button></small>
+    <small>&copy; <span id="year"></span> &middot; All rights reserved</small>
+  </div>
+</footer>
+
+<dialog id="logModal" aria-labelledby="logTitle">
+  <div class="modal">
+    <button class="modal-close" id="logClose" aria-label="Close changelog">&times;</button>
+    <h2 id="logTitle">Changelog</h2>
+    <p class="sub">Current version <b>v<span class="siteVer"></span></b> &middot; what changed and when.</p>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</dialog>
+
+<dialog id="accModal" aria-labelledby="accTitle">
+  <div class="modal">
+    <button class="modal-close" id="accClose" aria-label="Close">&times;</button>
+    <div class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+    <h2 id="accTitle">Private tool</h2>
+    <p class="acc-msg" id="accMsg"></p>
+    <div class="acc-sub">Access criteria</div>
+    <div id="accCrit"></div>
+    <div class="acc-sub">Request access</div>
+    <div class="contact-card">
+      <div class="av" id="accAv">H</div>
+      <div><b id="accName"></b><small id="accRole"></small></div>
+    </div>
+    <div class="acc-actions" id="accActions"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =========================================================
+   >>> EDIT YOUR TOOLS HERE <<<
+   ---------------------------------------------------------
+   name        : Card title
+   tag         : Small label above the description (category)
+   tagline     : One-line summary, always visible
+   description : Paragraph shown when the card is expanded
+   features    : Bullet list shown when the card is expanded
+   url         : Link opened by the "Launch" button.
+                 Leave "#" until the link is ready.
+   icon        : "dashboard" | "markdown" | "release" | "code" | "gear" | "chart"
+   color1/2    : Gradient colors of the card
+   open        : true = card starts expanded
+   flags       : list of flag keys, e.g. ["private"] or ["open-source","beta"]
+                 (see FLAGS below for every available flag)
+   access      : (private tools) optional { message, criteria: [...] }
+                 overrides the defaults in ACCESS_DEFAULTS below
+   repo        : (open-source tools) optional link shown as "View source"
+   url         : set to null or "#" while the link is not ready. A private
+                 tool with no URL shows the "request access" message.
+   ========================================================= */
+const TOOLS = [
+  {
+    name: "ACE Dashboard",
+    tag: "Monitoring",
+    tagline: "A live view of the integrations servers endpoints.",
+    description: "ACE Dashboard gives the team the integration servers insights, endpoints view and search without digging through the console.",
+    features: [
+      "Real-time overview",
+      "Quick visibility of the endpoints",
+      "Clean, searchable, easy-to-read"
+    ],
+    url: null,
+    flags: ["private"],
+    access: {
+      message: "ACE Dashboard is a private tool. It is available only to approved users, so please contact Habib personally to request access.",
+      criteria: [
+        "Approved users and teams only",
+        "Access must be requested and approved by the owner"
+      ]
+    },
+    icon: "dashboard",
+    version: "1.1.0",
+    changelog: [
+      // { version: "1.0.0", date: "2026-11-17", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#4f8cff", color2: "#7a5cff",
+    open: false
+  },
+  {
+    name: "Markdown Converter",
+    tag: "Productivity",
+    tagline: "Turn Markdown into polished, share-ready output in seconds.",
+    description: "Replace this text with your own description. Paste or write Markdown and convert it instantly into clean, formatted content that is ready to share or publish.",
+    features: [
+      "Instant conversion with live preview",
+      "Supports headings, tables, lists and code blocks",
+      "Simple copy-and-go workflow"
+    ],
+    url: "./tools/markdown-converter_latest.html",
+    flags: ["new"],
+    icon: "markdown",
+    version: "1.1.0",
+    changelog: [
+      // { version: "1.0.0", date: "2026-11-17", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#22d3b6", color2: "#3b9bff",
+    open: false
+  },
+  {
+    name: "Release Snippets",
+    tag: "Delivery",
+    tagline: "Reusable snippets that make every release faster and consistent.",
+    description: "Replace this text with your own description. Release Snippets keeps the commonly used release text, commands and templates in one place so deployments stay consistent and error-free.",
+    features: [
+      "Ready-to-use release templates and snippets",
+      "One-click copy for faster deployments",
+      "Standardised wording across all releases"
+    ],
+    url: "./tools/release-snippets_latest.html",
+    flags: ["new"],
+    icon: "release",
+    version: "1.9.0",
+    changelog: [
+      // { version: "1.0.0", date: "2026-11-17", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#ff7a59", color2: "#ff4fa3",
+    open: false
+  }
+];
+
+/* =========================================================
+   SITE VERSION & CHANGELOG (edit here)
+   ---------------------------------------------------------
+   Update SITE.version / SITE.updated on every release and add
+   a new entry at the TOP of CHANGELOG.
+   type : "new" | "improved" | "fixed" | "removed"
+   ========================================================= */
+const SITE = { version: "1.1.0", updated: "2026-11-18" };
+
+const CHANGELOG = [
+  {
+    version: "1.1.0", date: "2026-11-18",
+    changes: [
+      { type: "new", text: "Tool flags: Public, Private, Open Source, Internal, Beta, New, Coming Soon, Maintenance and Deprecated." },
+      { type: "new", text: "Private tools now show an access-request dialog with criteria and contact details." },
+      { type: "new", text: "Filter tools by flag, plus an optional View source link for open-source tools." },
+      { type: "improved", text: "ACE Dashboard is now flagged as Private." }
+    ]
+  },
+  {
+    version: "1.0.0", date: "2026-11-17",
+    changes: [
+      { type: "new", text: "Initial release of the tools portal." },
+      { type: "new", text: "Added ACE Dashboard, Markdown Converter and Release Snippets cards." },
+      { type: "new", text: "Foldable tool descriptions, search, and light/dark theme." },
+      { type: "new", text: "Version label and changelog." }
+    ]
+  }
+];
+
+/* =========================================================
+   FLAGS, CONTACT & ACCESS MESSAGE (edit here)
+   ---------------------------------------------------------
+   Available flags (use the key in a tool's "flags" list):
+     public       : open to every visitor
+     private      : restricted, contact the owner for access
+     open-source  : source code is available
+     internal     : for internal teams only
+     beta         : still being tested
+     new          : recently released
+     coming-soon  : not available yet
+     maintenance  : temporarily unavailable (Launch is blocked)
+     deprecated   : being retired, avoid for new work
+   You can add your own flag by adding an entry to FLAGS.
+   ========================================================= */
+const FLAGS = {
+  "public":      { label: "Public",      color: "#22d3b6", icon: "globe",    desc: "Open to all visitors" },
+  "private":     { label: "Private",     color: "#ff5c7a", icon: "lock",     desc: "Restricted access. Contact the owner to request access" },
+  "open-source": { label: "Open Source", color: "#a45cff", icon: "branch",   desc: "Source code is available" },
+  "internal":    { label: "Internal",    color: "#4f8cff", icon: "building", desc: "For internal teams only" },
+  "beta":        { label: "Beta",        color: "#ffb020", icon: "flask",    desc: "Still being tested. Feedback is welcome" },
+  "new":         { label: "New",         color: "#3ddc84", icon: "sparkle",  desc: "Recently released" },
+  "coming-soon": { label: "Coming Soon", color: "#8da2ff", icon: "clock",    desc: "Not available yet" },
+  "maintenance": { label: "Maintenance", color: "#ff8a3d", icon: "wrench",   desc: "Temporarily unavailable" },
+  "deprecated":  { label: "Deprecated",  color: "#9aa7c7", icon: "archive",  desc: "Being retired. Avoid for new work" }
+};
+
+/* Who to contact for private tools (shown in the access dialog) */
+const CONTACT = {
+  name:  "Habib AlMawali",
+  role:  "Tool owner & developer",
+  email: "habib.almawali@gmail.com",
+  phone: "+968 96939777",                          /* optional, e.g. "+968 0000 0000" */
+  phoneLabel: "Call"
+};
+
+/* Default text for the access dialog (a tool can override via its own "access" field) */
+const ACCESS_DEFAULTS = {
+  message: "This tool is private and is not open to general access. Access is granted only to approved users, so please contact the owner personally to request it.",
+  criteria: [
+    "Approved users and teams only",
+    "A valid business need for the tool",
+    "Approval from the tool owner"
+  ]
+};
+
+/* =========================================================
+   ROTATING HERO LINES (edit freely)
+   ========================================================= */
+const TYPED_LINES = [
+  "> Built in-house. Hosted on-prem.",
+  "> Simple tools. Serious impact.",
+  "> Developed by Habib AlMawali."
+];
+
+/* =========================================================
+   ICONS
+   ========================================================= */
+const ICONS = {
+  dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  markdown:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M6 15V9l3 3.5L12 9v6M16 9v6m0 0l-2-2m2 2l2-2"/></svg>',
+  release:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.3-2 5-2 5s3.7-.5 5-2M12 15l-3-3a22 22 0 012-4 12 12 0 0111-5c0 2.7-.8 7.3-5 11a22 22 0 01-4 2z"/><circle cx="15.5" cy="8.5" r="1.2"/></svg>',
+  code:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>',
+  gear:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
+  chart:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>'
+};
+const CHEVRON = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+const ARROW   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>';
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toastEl = $('#toast'); let toastTimer;
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+}
+
+/* =========================================================
+   RENDER CARDS
+   ========================================================= */
+const FLAG_ICONS = {
+  lock:     '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
+  globe:    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
+  branch:   '<circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="9" r="2"/><path d="M6 7v10M18 11c0 4-6 3-12 6"/>',
+  building: '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"/>',
+  flask:    '<path d="M9 3h6M10 3v6l-5 9a2 2 0 001.8 3h10.4a2 2 0 001.8-3l-5-9V3"/>',
+  sparkle:  '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  clock:    '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  wrench:   '<path d="M14.7 6.3a4 4 0 005 5L21 13l-8 8a2.8 2.8 0 01-4-4l8-8z"/>',
+  archive:  '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 001 1h12a1 1 0 001-1V8M10 12h4"/>'
+};
+const flagSvg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${FLAG_ICONS[k] || FLAG_ICONS.sparkle}</svg>`;
+const flagInfo = key => FLAGS[key] || { label: key, color: '#9aa7c7', icon: 'sparkle', desc: key };
+const flagChip = key => { const f = flagInfo(key); return `<span class="flag" style="--f:${esc(f.color)}" title="${esc(f.desc)}">${flagSvg(f.icon)}${esc(f.label)}</span>`; };
+const LOCK_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>';
+const CODE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>';
+
+const LABELS = { new: 'New', improved: 'Improved', fixed: 'Fixed', removed: 'Removed' };
+function renderEntries(entries) {
+  return (entries || []).map(e => `
+    <div class="log-entry">
+      <div class="log-entry-head"><b>v${esc(e.version)}</b><span>${esc(e.date || '')}</span></div>
+      ${(e.changes || []).map(c => `<div class="chg"><span class="chg-type ${esc(c.type)}">${esc(LABELS[c.type] || c.type)}</span><span>${esc(c.text)}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+const cardsEl = $('#cards');
+TOOLS.forEach((t, i) => {
+  const id = 'panel-' + i;
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.style.setProperty('--c1', t.color1);
+  card.style.setProperty('--c2', t.color2);
+  card.style.animationDelay = (i * 120) + 'ms';
+  const flags = t.flags || [];
+  const hasUrl = !!(t.url && String(t.url).trim() && String(t.url).trim() !== '#');
+  const isPrivate = flags.includes('private');
+  const isMaint = flags.includes('maintenance');
+  card.dataset.search = (t.name + ' ' + t.tag + ' ' + t.tagline + ' ' + t.description + ' ' + flags.map(k => flagInfo(k).label).join(' ')).toLowerCase();
+  card.dataset.flags = flags.join(',');
+
+  card.innerHTML = `
+    <div class="card-head">
+      <div class="card-icon">${ICONS[t.icon] || ICONS.code}</div>
+      <div class="card-title"><h3>${esc(t.name)}</h3><span class="tag">${esc(t.tag)}</span>${t.version ? `<span class="ver">v${esc(t.version)}</span>` : ''}</div>
+    </div>
+    ${flags.length ? `<div class="flags">${flags.map(flagChip).join('')}</div>` : ''}
+    <p class="tagline">${esc(t.tagline)}</p>
+
+    <button class="toggle" aria-expanded="${!!t.open}" aria-controls="${id}">
+      <span>About this tool</span>${CHEVRON}
+    </button>
+    <div class="panel ${t.open ? 'open' : ''}" id="${id}">
+      <div class="panel-inner">
+        <div class="panel-body">
+          <p>${esc(t.description)}</p>
+          <ul>${(t.features || []).map(f => `<li>${esc(f)}</li>`).join('')}</ul>
+          ${t.changelog && t.changelog.length ? `<div class="log"><h4>Changelog</h4>${renderEntries(t.changelog)}</div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <a class="launch" href="${esc(t.url || '#')}" target="_blank" rel="noopener noreferrer"${isPrivate && !hasUrl ? ' aria-haspopup="dialog"' : ''}>
+      Launch ${esc(t.name)} ${isPrivate && !hasUrl ? LOCK_ARROW : ARROW}
+    </a>
+    ${t.repo ? `<a class="src-link" href="${esc(t.repo)}" target="_blank" rel="noopener noreferrer">${CODE_ICON} View source</a>` : ''}`;
+  cardsEl.appendChild(card);
+
+  // Fold / unfold
+  const btn = $('.toggle', card), panel = $('.panel', card);
+  btn.addEventListener('click', () => setOpen(btn, panel, !panel.classList.contains('open')));
+
+  // Placeholder link guard
+  const link = $('.launch', card);
+  link.addEventListener('click', e => {
+    if (isMaint) { e.preventDefault(); toast(t.name + ' is under maintenance. Please try again later.'); return; }
+    if (hasUrl) return;                         // link is set: open it normally
+    e.preventDefault();
+    if (isPrivate) openAccess(t);               // private + no URL: request-access dialog
+    else toast(t.name + ' link is coming soon');
+  });
+
+  // Cursor spotlight + subtle 3D tilt
+  card.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    card.style.setProperty('--mx', x + 'px'); card.style.setProperty('--my', y + 'px');
+    if (e.pointerType === 'mouse' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const rx = ((y / r.height) - .5) * -5, ry = ((x / r.width) - .5) * 5;
+      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    }
+  });
+  card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+});
+
+function setOpen(btn, panel, open) {
+  panel.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+}
+$('#expandAll').addEventListener('click', () =>
+  document.querySelectorAll('.card:not(.hidden)').forEach(c => setOpen($('.toggle', c), $('.panel', c), true)));
+$('#collapseAll').addEventListener('click', () =>
+  document.querySelectorAll('.card').forEach(c => setOpen($('.toggle', c), $('.panel', c), false)));
+
+/* Search + flag filter */
+let activeFlag = 'all';
+function applyFilters() {
+  const q = $('#search').value.trim().toLowerCase(); let shown = 0;
+  document.querySelectorAll('.card').forEach(c => {
+    const okText = !q || c.dataset.search.includes(q);
+    const okFlag = activeFlag === 'all' || (c.dataset.flags || '').split(',').includes(activeFlag);
+    const match = okText && okFlag;
+    c.classList.toggle('hidden', !match); if (match) shown++;
+  });
+  $('#empty').classList.toggle('show', shown === 0);
+}
+$('#search').addEventListener('input', applyFilters);
+
+(function buildFilters() {
+  const counts = {};
+  TOOLS.forEach(t => (t.flags || []).forEach(k => counts[k] = (counts[k] || 0) + 1));
+  const keys = Object.keys(counts);
+  const box = $('#filters');
+  if (!keys.length) { box.style.display = 'none'; return; }
+  const mk = (key, label, n, icon) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (key === 'all' ? ' active' : ''); b.dataset.key = key;
+    b.setAttribute('aria-pressed', key === 'all');
+    b.innerHTML = (icon ? flagSvg(icon) : '') + `<span>${esc(label)}</span><span class="n">${n}</span>`;
+    b.addEventListener('click', () => {
+      activeFlag = key;
+      box.querySelectorAll('.chip').forEach(x => { const on = x.dataset.key === key; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on); });
+      applyFilters();
+    });
+    box.appendChild(b);
+  };
+  mk('all', 'All', TOOLS.length);
+  keys.forEach(k => mk(k, flagInfo(k).label, counts[k], flagInfo(k).icon));
+})();
+
+/* =========================================================
+   STATS COUNTER
+   ========================================================= */
+(function countUp() {
+  const el = $('#statTools'), target = TOOLS.length; let n = 0;
+  const step = () => { n++; el.textContent = n; if (n < target) setTimeout(step, 260); };
+  setTimeout(step, 500);
+})();
+
+/* =========================================================
+   TYPING EFFECT
+   ========================================================= */
+(function typing() {
+  const el = $('#typed'); let li = 0, ci = 0, del = false;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = TYPED_LINES[0]; return; }
+  (function tick() {
+    const line = TYPED_LINES[li];
+    el.textContent = line.slice(0, ci);
+    if (!del && ci < line.length) { ci++; return setTimeout(tick, 55); }
+    if (!del) { del = true; return setTimeout(tick, 1700); }
+    if (ci > 0) { ci--; return setTimeout(tick, 25); }
+    del = false; li = (li + 1) % TYPED_LINES.length; setTimeout(tick, 350);
+  })();
+})();
+
+/* =========================================================
+   THEME TOGGLE (remembers choice)
+   ========================================================= */
+const SUN  = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>';
+const MOON = '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>';
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  $('#themeIcon').innerHTML = t === 'dark' ? SUN : MOON;
+}
+let theme = 'dark';
+try { theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); } catch (e) {}
+applyTheme(theme);
+$('#themeBtn').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark'; applyTheme(theme);
+  try { localStorage.setItem('theme', theme); } catch (e) {}
+});
+
+$('#year').textContent = new Date().getFullYear();
+
+/* =========================================================
+   SITE VERSION + CHANGELOG MODAL
+   ========================================================= */
+document.querySelectorAll('.siteVer').forEach(el => el.textContent = SITE.version);
+$('#siteDate').textContent = SITE.updated;
+$('#timeline').innerHTML = renderEntries(CHANGELOG);
+
+const dlg = $('#logModal');
+function openLog() { if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', ''); }
+function closeLog() { if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); }
+$('#verBtn').addEventListener('click', openLog);
+$('#verBtn2').addEventListener('click', openLog);
+$('#logClose').addEventListener('click', closeLog);
+dlg.addEventListener('click', e => { if (e.target === dlg) closeLog(); });
+
+/* =========================================================
+   ACCESS-REQUEST DIALOG (private tools)
+   ========================================================= */
+const accDlg = $('#accModal');
+function openAccess(t) {
+  const a = t.access || {};
+  $('#accTitle').textContent = t.name + ' is a private tool';
+  $('#accMsg').textContent = a.message || ACCESS_DEFAULTS.message;
+  $('#accCrit').innerHTML = (a.criteria || ACCESS_DEFAULTS.criteria).map(c => `<div class="crit">${esc(c)}</div>`).join('');
+  $('#accAv').textContent = (CONTACT.name || 'H').trim().charAt(0).toUpperCase();
+  $('#accName').textContent = CONTACT.name;
+  $('#accRole').textContent = CONTACT.role || '';
+  const subject = encodeURIComponent('Access request: ' + t.name);
+  const body = encodeURIComponent('Hello ' + (CONTACT.name || '') + ',\n\nI would like to request access to ' + t.name + '.\n\nName:\nTeam / Department:\nReason for access:\n\nThank you.');
+  let actions = '';
+  if (CONTACT.email) actions += `<a href="mailto:${esc(CONTACT.email)}?subject=${subject}&body=${body}">Email to request access</a>`;
+  if (CONTACT.phone) actions += `<a class="alt" href="tel:${esc(CONTACT.phone.replace(/\s+/g, ''))}">${esc(CONTACT.phoneLabel || 'Call')} ${esc(CONTACT.phone)}</a>`;
+  $('#accActions').innerHTML = actions;
+  if (typeof accDlg.showModal === 'function') accDlg.showModal(); else accDlg.setAttribute('open', '');
+}
+function closeAcc() { if (typeof accDlg.close === 'function') accDlg.close(); else accDlg.removeAttribute('open'); }
+$('#accClose').addEventListener('click', closeAcc);
+accDlg.addEventListener('click', e => { if (e.target === accDlg) closeAcc(); });
+</script>
+</body>
+</html>
