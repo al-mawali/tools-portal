@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FormatForge – JSON · YAML · XML · CSV Validator &amp; Formatter</title>
+<style>
+:root{--bg:#0b0d1a;--p:rgba(255,255,255,.06);--b:rgba(255,255,255,.12);--t:#e8eaf6;--m:#8b90b8;--a:#7c5cff;--a2:#00d4ff;--ok:#2ee59d;--er:#ff5d7a;--k:#7dd3fc;--s:#a7f3d0;--n:#fbbf24}
+[data-theme=light]{--bg:#eef0fb;--p:rgba(255,255,255,.78);--b:rgba(60,60,120,.16);--t:#1c1e3a;--m:#5d618a;--k:#0369a1;--s:#047857;--n:#b45309}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:flex;flex-direction:column;color:var(--t);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(at 12% 8%,rgba(124,92,255,.35),transparent 45%),radial-gradient(at 88% 0,rgba(0,212,255,.25),transparent 40%),var(--bg) fixed}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px}
+.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font:700 18px ui-monospace,monospace;color:#fff;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 6px 22px rgba(124,92,255,.5)}
+h1{margin:0;font-size:20px;letter-spacing:-.3px}h1 span{background:linear-gradient(90deg,var(--a),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+small{color:var(--m)}.sp{flex:1}
+.ver{font:600 11px ui-monospace,monospace;padding:3px 9px;border-radius:99px;background:var(--p);border:1px solid var(--b);color:var(--a2);cursor:pointer}
+button,select,input{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--b);border-radius:10px;padding:7px 12px;backdrop-filter:blur(10px);cursor:pointer;transition:.15s}
+button:hover,select:hover{border-color:var(--a);transform:translateY(-1px)}
+button.pri{background:linear-gradient(135deg,var(--a),var(--a2));border:0;color:#fff;font-weight:600;box-shadow:0 4px 16px rgba(124,92,255,.4)}
+select option{color:#111}
+.tb{display:flex;gap:8px;padding:0 18px 10px;overflow-x:auto;scrollbar-width:thin;align-items:center}.tb>*{flex:none}
+main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 18px}
+.pane{display:flex;flex-direction:column;min-height:0;background:var(--p);border:1px solid var(--b);border-radius:16px;backdrop-filter:blur(14px);overflow:hidden}
+.ph{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--b);flex-wrap:wrap}.ph button,.ph input{padding:4px 9px;font-size:12px}
+#q{width:130px;flex:1;min-width:90px;font-family:ui-monospace,monospace}
+textarea,.out{flex:1;width:100%;min-height:0;margin:0;padding:12px;border:0;outline:0;resize:none;background:transparent;color:var(--t);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto;tab-size:2}
+.out{white-space:pre;overflow:auto}.out.err{color:var(--er)}
+.out i{font-style:normal}i.string,i.s{color:var(--s)}i.number,i.num{color:var(--n)}i.boolean,i.n,i.kw{color:#f472b6}i.key{color:var(--k)}
+.out details{margin-left:16px}.out summary{cursor:pointer}.out div{margin-left:16px}.out b{color:var(--k);font-weight:500}.out em{color:var(--m);font-style:normal}
+.tab.on{background:var(--a);color:#fff;border-color:var(--a)}
+.st{display:flex;gap:14px;align-items:center;margin:12px 18px 0;padding:9px 14px;border-radius:12px;background:var(--p);border:1px solid var(--b);font:12px ui-monospace,monospace;flex-wrap:wrap}
+.st.ok{border-color:var(--ok);color:var(--ok)}.st.bad{border-color:var(--er);color:var(--er)}.st span:not(#stt){color:var(--m)}
+footer{text-align:center;color:var(--m);padding:12px;font-size:12px}footer b{color:var(--t)}
+dialog{width:min(560px,92vw);max-height:80vh;overflow:auto;background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:18px;padding:18px}dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:17px}
+.rel{border-left:3px solid var(--a);padding-left:12px;margin:12px 0}.rel h4{margin:0}.rel li{margin:3px 0}
+.hi{padding:8px;border:1px solid var(--b);border-radius:10px;margin:6px 0;cursor:pointer;font:12px ui-monospace,monospace}.hi:hover{border-color:var(--a)}
+@media(max-width:860px){body{height:auto}main{grid-template-columns:1fr}.pane{height:52vh;min-height:300px}h1{font-size:17px}header small{display:none}}
+@media(min-width:861px){body{height:100dvh}}
+</style></head><body>
+<header><div class="logo">{ }</div><div><h1>Format<span>Forge</span></h1><small>JSON · YAML · XML · CSV — validate, format, convert</small></div><span class="ver" id="ver" title="Change log">v1.0.0</span><div class="sp"></div><button id="bh" title="History">🕘</button><button id="bk" title="Shortcuts &amp; about">❔</button><button id="bt" title="Theme">🌓</button></header>
+<div class="tb">
+<select id="fmt" title="Input format"><option value="auto">Auto-detect</option><option>json</option><option>yaml</option><option>xml</option><option>csv</option></select>
+<select id="ind" title="Indent"><option value="2">2 spaces</option><option value="4">4 spaces</option><option value="t">Tab</option></select>
+<button class="pri" data-a="format">✨ Format</button><button data-a="minify">🗜 Minify</button><button data-a="validate">✔ Validate</button><button data-a="sort">⇅ Sort keys</button><button id="rp" title="Fix comments, trailing commas, single quotes, unquoted keys">🛠 Repair JSON</button>
+<select id="to"><option value="">⇄ Convert to…</option><option>json</option><option>yaml</option><option>xml</option><option>csv</option></select>
+<select id="tool"><option value="">🧰 Text tools…</option><option value="b64e">Base64 encode</option><option value="b64d">Base64 decode</option><option value="esc">Escape string</option><option value="unesc">Unescape string</option><option value="ue">URL encode</option><option value="ud">URL decode</option></select>
+</div>
+<main>
+<section class="pane"><div class="ph"><b>Input</b><span class="sp"></span><button id="up">📂 Open</button><button id="sm">🧪 Sample</button><label><input type="checkbox" id="wr"> wrap</label><button id="cl">🗑</button></div><textarea id="in" spellcheck="false" placeholder="Paste, type or drop a file here…"></textarea></section>
+<section class="pane"><div class="ph"><b>Output</b><button class="tab on" data-v="text">Text</button><button class="tab" data-v="tree">Tree</button><input id="q" placeholder="Query: $.users[0].name" title="JSONPath-style query"><button id="cp">📋 Copy</button><button id="dl">⬇ Save</button><button id="sw">↰ Use</button></div><div class="out" id="out"></div></section>
+</main>
+<div class="st" id="st"><span id="stt">Ready — paste data and hit Format (Ctrl+Enter)</span><span class="sp"></span><span id="pos"></span><span id="sz"></span></div>
+<footer>Developed by <b>Habib AlMawali</b> · FormatForge <span id="fv">v1.0.0</span> · 100% offline, your data never leaves this device</footer>
+<input type="file" id="fi" hidden>
+<dialog id="dlg"><div class="dh"><b id="dt"></b><button onclick="dlg.close()">✕</button></div><div id="db"></div></dialog>
+<script>
+const $=s=>document.querySelector(s),inp=$('#in'),out=$('#out'),st=$('#st'),VER='1.0.0';
+const LS={g:k=>{try{return localStorage.getItem(k)}catch(e){}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let cur={text:'',fmt:'json'},view='text',F='json';
+const U=()=>({2:'  ',4:'    ',t:'\t'}[$('#ind').value]);
+/* ---------- YAML (common subset) ---------- */
+function ystrip(s){let q=null;for(let i=0;i<s.length;i++){let c=s[i];if(q){if(c==q)q=null}else if((c=='"'||c=="'")&&(i==0||/[\s:\-\[{,]/.test(s[i-1])))q=c;else if(c=='#'&&(i==0||/\s/.test(s[i-1])))return s.slice(0,i)}return s}
+function yscalar(s,n){s=s.trim();if(s===''||s=='~'||/^null$/i.test(s))return null;
+ if(s[0]=='"'){try{return JSON.parse(s)}catch(e){throw{message:'Bad double-quoted string',line:n}}}
+ if(s[0]=="'")return s.slice(1,-1).replace(/''/g,"'");
+ if(/^[\[{]/.test(s)){try{return JSON.parse(s)}catch(e){try{return JSON.parse(s.replace(/"[^"]*"|[^\s\[\]{},:]+/g,m=>m[0]=='"'||/^(-?\d+(\.\d+)?|true|false|null)$/.test(m)?m:JSON.stringify(m)))}catch(e2){throw{message:'Bad inline collection',line:n}}}}
+ if(/^(true|false)$/i.test(s))return s.toLowerCase()=='true';
+ if(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s))return Number(s);return s}
+function yp(src){let L=src.split('\n').map((s,n)=>({n:n+1,i:s.match(/^ */)[0].length,t:ystrip(s).trim()})).filter(l=>l.t&&l.t!='---'&&l.t!='...'),p=0;
+ if(/\t/.test(src.replace(/(["'])(?:\\.|(?!\1).)*\1/g,'').split('\n').map(x=>x.match(/^\s*/)[0]).join('')))throw{message:'Tabs are not allowed for YAML indentation',line:src.split('\n').findIndex(x=>/^\s*\t/.test(x))+1};
+ const dash=l=>l.t[0]=='-'&&(l.t.length==1||l.t[1]==' '),kv=/^("[^"]*"|'[^']*'|[^\s"'\[{#-][^:]*?|-[^\s][^:]*?):(?:\s+(.*))?$/;
+ function blk(){let l=L[p];return dash(l)?lst(l.i):mp(l.i)}
+ function lst(ind){let a=[];while(p<L.length&&L[p].i==ind&&dash(L[p])){let l=L[p],r=l.t.slice(1).trim();
+  if(!r){p++;a.push(p<L.length&&L[p].i>ind?blk():null)}else if(kv.test(r)&&!/^[\[{"']/.test(r)||kv.test(r)){L[p]={n:l.n,i:ind+l.t.length-r.length,t:r};a.push(mp(L[p].i))}else{p++;a.push(yscalar(r,l.n))}}return a}
+ function mp(ind){let o={};while(p<L.length&&L[p].i==ind&&!dash(L[p])){let l=L[p],m=l.t.match(kv);if(!m)throw{message:'Expected "key: value"',line:l.n};
+  let k=m[1].replace(/^(["'])(.*)\1$/,'$2'),r=m[2];if(k in o)throw{message:'Duplicate key "'+k+'"',line:l.n};p++;
+  if(r===undefined||r==='')o[k]=p<L.length&&(L[p].i>ind||(L[p].i==ind&&dash(L[p])))?(L[p].i==ind?lst(ind):blk()):null;
+  else if(/^[|>][+-]?$/.test(r)){let b=[];while(p<L.length&&L[p].i>ind)b.push(L[p++].t);o[k]=r[0]=='|'?b.join('\n')+'\n':b.join(' ')}
+  else o[k]=yscalar(r,l.n)}
+  if(p<L.length&&L[p].i>ind)throw{message:'Unexpected indentation',line:L[p].n};return o}
+ if(!L.length)return null;if(!dash(L[0])&&!kv.test(L[0].t)&&L.length==1)return yscalar(L[0].t,L[0].n);
+ let r=blk();if(p<L.length)throw{message:'Unexpected content / indentation',line:L[p].n};return r}
+const cx=x=>x&&typeof x=='object'&&Object.keys(x).length>0;
+const ys=v=>v===null?'null':typeof v=='string'?(/^$|^[\s\-?:,\[\]{}#&*!|>'"%@`]|: |:$| #|\s$|\n|^(true|false|null|~|yes|no|[-+]?[\d.]+(e[-+]?\d+)?)$/i.test(v)?JSON.stringify(v):v):Array.isArray(v)?'[]':typeof v=='object'?'{}':String(v);
+function yd(v,p,u){if(!cx(v))return p+ys(v);
+ if(Array.isArray(v))return v.map(i=>cx(i)?p+'- '+yd(i,p+'  ',u).slice(p.length+2):p+'- '+ys(i)).join('\n');
+ return Object.keys(v).map(k=>{let x=v[k];return cx(x)?p+ys(k)+':\n'+yd(x,p+u,u):p+ys(k)+': '+ys(x)}).join('\n')}
+/* ---------- XML ---------- */
+function x2o(e){let o={},h=0,t='';for(let a of e.attributes){o['@'+a.name]=a.value;h=1}
+ for(let c of e.childNodes){if(c.nodeType==1){h=1;let v=x2o(c),n=c.nodeName;if(n in o){if(!Array.isArray(o[n]))o[n]=[o[n]];o[n].push(v)}else o[n]=v}else if(c.nodeType==3||c.nodeType==4)t+=c.nodeValue}
+ t=t.trim();if(!h)return t;if(t)o['#text']=t;return o}
+function px(t){let d=new DOMParser().parseFromString(t,'application/xml'),e=d.querySelector('parsererror');if(e)throw{message:(e.querySelector('div')||e).textContent.trim().split('\n')[0].slice(0,220)};let r=d.documentElement;return{[r.nodeName]:x2o(r)}}
+const xe=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const xn=k=>k.replace(/[^\w.\-:]/g,'_').replace(/^(?=[\d.\-])/,'_');
+function xo(k,v,p,u,nl){k=xn(k);if(Array.isArray(v))return v.map(i=>xo(k,i,p,u,nl)).join(nl);
+ if(v===null||typeof v!='object')return p+'<'+k+'>'+(v===null?'':xe(v))+'</'+k+'>';
+ let ks=Object.keys(v),a=ks.filter(x=>x[0]=='@').map(x=>' '+xn(x.slice(1))+'="'+xe(v[x])+'"').join(''),c=ks.filter(x=>x[0]!='@'&&x!='#text'),t=v['#text'];
+ if(!c.length)return p+'<'+k+a+(t==null?'/>':'>'+xe(t)+'</'+k+'>');
+ return p+'<'+k+a+'>'+nl+c.map(x=>xo(x,v[x],p+u,u,nl)).join(nl)+nl+p+'</'+k+'>'}
+function xd(o,min){let u=min?'':U(),nl=min?'':'\n',ks=o&&typeof o=='object'&&!Array.isArray(o)?Object.keys(o):[];
+ return '<?xml version="1.0" encoding="UTF-8"?>'+nl+(ks.length==1&&ks[0][0]!='@'?xo(ks[0],o[ks[0]],'',u,nl):xo('root',o,'',u,nl))+nl}
+/* ---------- CSV ---------- */
+const cv=s=>/^-?\d+(\.\d+)?$/.test(s)?Number(s):s=='true'?true:s=='false'?false:s;
+function pc(t){let r=[],row=[],f='',q=0,h1=t.split('\n')[0],d=h1.includes('\t')&&!h1.includes(',')?'\t':h1.split(';').length>h1.split(',').length?';':',';
+ for(let i=0;i<t.length;i++){let c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==d){row.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;row.push(f);r.push(row);row=[];f=''}else f+=c}
+ if(q)throw{message:'Unterminated quoted field'};if(f!==''||row.length){row.push(f);r.push(row)}
+ r=r.filter(x=>x.length>1||x[0]!=='');let h=r.shift();if(!h)return[];
+ return r.map((x,n)=>{if(x.length!=h.length)throw{message:'Row has '+x.length+' columns, expected '+h.length,line:n+2};return Object.fromEntries(h.map((k,i)=>[k,cv(x[i])]))})}
+function toCSV(v){let a=(Array.isArray(v)?v:[v]).map(x=>x&&typeof x=='object'&&!Array.isArray(x)?x:{value:x}),ks=[...new Set(a.flatMap(Object.keys))];
+ const c=x=>{let s=x&&typeof x=='object'?JSON.stringify(x):x==null?'':String(x);return /[",;\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+ return [ks.map(c).join(',')].concat(a.map(r=>ks.map(k=>c(r[k])).join(','))).join('\n')+'\n'}
+/* ---------- core ---------- */
+const P={json:t=>JSON.parse(t),xml:px,yaml:yp,csv:pc};
+function sf(o,f,min){if(f=='json')return min?JSON.stringify(o):JSON.stringify(o,null,U());
+ if(f=='yaml')return min?JSON.stringify(o):yd(o,'',U()=='\t'?'  ':U())+'\n';if(f=='xml')return xd(o,min);return toCSV(o)}
+function detect(t){t=t.trim();if(t[0]=='<')return'xml';if(/^[\[{]/.test(t))return'json';try{JSON.parse(t);return'json'}catch(e){}
+ let l=t.split('\n');if(l.length>1&&/^[^:]+([,;\t])[^:]*$/.test(l[0])&&l[0].split(/[,;\t]/).length>1&&!/^\s*-\s/.test(l[0]))return'csv';return'yaml'}
+const srt=v=>Array.isArray(v)?v.map(srt):v&&typeof v=='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,srt(v[k])])):v;
+function stats(o){let k=0,d=0,n=0;(function w(v,l){d=Math.max(d,l);n++;if(v&&typeof v=='object')for(let x in v){k++;w(v[x],l+1)}})(o,0);return{k,d,n}}
+function norm(e,t){let m=e.message||String(e),l=e.line,c=e.col;
+ if(l==null){let a=m.match(/position (\d+)/);if(a){let b=t.slice(0,+a[1]).split('\n');l=b.length;c=b[b.length-1].length+1}else{let a1=m.match(/line:? (\d+)/i),a2=m.match(/column:? (\d+)/i);if(a1)l=+a1[1];if(a2)c=+a2[1]}}
+ return{message:m.replace(/^JSON\.parse: /,''),line:l,col:c}}
+function bad(e,t,f,jump){let x=norm(e,t);st.className='st bad';
+ $('#stt').textContent='✕ Invalid '+f.toUpperCase()+' — '+x.message+(x.line?' (line '+x.line+(x.col?', col '+x.col:'')+')':'');
+ let L=t.split('\n'),h='';if(x.line)for(let i=Math.max(0,x.line-3);i<Math.min(L.length,x.line+2);i++){h+=(i+1==x.line?'▶ ':'  ')+String(i+1).padStart(4)+' │ '+L[i]+'\n';if(i+1==x.line&&x.col)h+=' '.repeat(9+x.col-1)+'^\n'}
+ cur={err:'Error: '+x.message+'\n\n'+h};render();
+ if(jump&&x.line){let L2=t.split('\n'),p=L2.slice(0,x.line-1).reduce((a,s)=>a+s.length+1,0)+Math.max(0,(x.col||1)-1);inp.focus();inp.setSelectionRange(p,p+1)}}
+function run(a,jump=1){let t=inp.value,f=$('#fmt').value;if(f=='auto')f=detect(t);F=f;
+ try{if(!t.trim())throw{message:'Input is empty'};let o=P[f](t);if(a=='sort')o=srt(o);
+  let to=a=='convert'?$('#to').value:f,s=sf(o,to,a=='minify');cur={obj:o,fmt:to,text:s};
+  let k=stats(o);st.className='st ok';$('#stt').textContent='✓ Valid '+f.toUpperCase()+' · '+k.k+' keys · depth '+k.d+' · '+k.n+' nodes'+(a=='minify'?' · '+Math.round(100-s.length/t.length*100)+'% smaller':'');
+  render();if(jump)hist(t,f)}catch(e){bad(e,t,f,jump)}}
+function live(){let t=inp.value;$('#sz').textContent=new Blob([t]).size.toLocaleString()+' B · '+(t?t.split('\n').length:0)+' lines';if(!t.trim()){st.className='st';$('#stt').textContent='Ready';return}
+ let f=$('#fmt').value;if(f=='auto')f=detect(t);try{let k=stats(P[f](t));st.className='st ok';$('#stt').textContent='✓ Valid '+f.toUpperCase()+' · '+k.k+' keys · depth '+k.d}catch(e){let x=norm(e,t);st.className='st bad';$('#stt').textContent='✕ '+f.toUpperCase()+': '+x.message.slice(0,110)+(x.line?' (line '+x.line+')':'')}}
+/* ---------- render ---------- */
+const hl=s=>s.replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\d+\.?\d*(?:[eE][+-]?\d+)?/g,(m,a,c,b)=>a?'<i class="'+(c?'key':'s')+'">'+esc(a)+'</i>'+(c||''):'<i class="'+(b?'kw':'num')+'">'+m+'</i>');
+function tn(k,v,d){let o=v&&typeof v=='object',e=document.createElement(o?'details':'div'),kk=k!==null?'<b>'+esc(k)+'</b>: ':'';
+ if(o){let n=Object.keys(v).length,s=document.createElement('summary');e.open=d<2;s.innerHTML=kk+'<em>'+(Array.isArray(v)?'['+n+']':'{'+n+'}')+'</em>';e.append(s);for(let x in v)e.append(tn(x,v[x],d+1))}
+ else e.innerHTML=kk+'<i class="'+(v===null?'n':typeof v)+'">'+esc(JSON.stringify(v))+'</i>';return e}
+function qry(o,p){let tk=p.replace(/^\$\.?/,'').match(/\[(?:\d+|\*|"[^"]*"|'[^']*')\]|[^.\[\]]+/g)||[],n=[o];if(!tk.length)return o;
+ for(let t of tk){let k=t[0]=='['?t.slice(1,-1).replace(/^["']|["']$/g,''):t,m=[];for(let v of n){if(v==null||typeof v!='object')continue;if(k=='*')m.push(...Object.values(v));else if(k in v)m.push(v[k])}n=m}
+ return n.length==1?n[0]:n}
+function render(){out.className='out';out.textContent='';if(cur.err){out.classList.add('err');out.textContent=cur.err;return}
+ let q=$('#q').value.trim(),o=cur.obj,tx=cur.text,j=cur.fmt=='json';
+ if(q&&o!==undefined){try{o=qry(o,q);tx=JSON.stringify(o,null,2);j=1}catch(e){tx='Query error'}}
+ if(view=='tree'&&o!==undefined)out.append(tn(null,o,0));else if(j&&tx.length<3e5)out.innerHTML=hl(tx);else out.textContent=tx;cur.shown=tx}
+/* ---------- UI ---------- */
+const SM={json:'{\n"name":"FormatForge","version":1,"tags":["json","yaml","xml"],"author":{"name":"Habib AlMawali","active":true},"users":[{"id":1,"name":"Aya"},{"id":2,"name":"Salim"}]}',
+yaml:'# sample\nname: FormatForge\nversion: 1\ntags: [json, yaml, xml]\nauthor:\n  name: Habib AlMawali\n  active: true\nusers:\n  - id: 1\n    name: Aya\n  - id: 2\n    name: Salim\n',
+xml:'<?xml version="1.0"?><app name="FormatForge"><version>1</version><user id="1">Aya</user><user id="2">Salim</user></app>',
+csv:'id,name,role\n1,Aya,admin\n2,Salim,"dev, backend"\n'};
+const TL={b64e:s=>{let r='';new TextEncoder().encode(s).forEach(c=>r+=String.fromCharCode(c));return btoa(r)},b64d:s=>new TextDecoder().decode(Uint8Array.from(atob(s.trim()),c=>c.charCodeAt(0))),
+esc:s=>JSON.stringify(s).slice(1,-1),unesc:s=>JSON.parse('"'+s.replace(/(?<!\\)"/g,'\\"')+'"'),ue:encodeURIComponent,ud:decodeURIComponent};
+function dlgShow(t,h){$('#dt').textContent=t;$('#db').innerHTML=h;dlg.showModal()}
+function hist(t,f){let h=JSON.parse(LS.g('ff_h')||'[]').filter(x=>x.t!=t);h.unshift({t:t.slice(0,50000),f,d:new Date().toLocaleString()});LS.s('ff_h',JSON.stringify(h.slice(0,12)))}
+document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>run(b.dataset.a));
+$('#to').onchange=e=>{if(e.target.value)run('convert');e.target.value=''};
+$('#tool').onchange=e=>{let k=e.target.value;e.target.value='';if(!k)return;try{cur={text:TL[k](inp.value),fmt:'text'};st.className='st ok';$('#stt').textContent='✓ Done';render()}catch(x){st.className='st bad';$('#stt').textContent='✕ '+x.message}};
+$('#rp').onclick=()=>{inp.value=inp.value.replace(/("(?:\\.|[^"\\])*")|\/\/.*|\/\*[\s\S]*?\*\/|'((?:\\.|[^'\\])*)'/g,(m,a,b)=>a?a:b!==undefined?JSON.stringify(b.replace(/\\'/g,"'")):'').replace(/([{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g,'$1"$2"$3').replace(/,(\s*[}\]])/g,'$1');$('#fmt').value='json';run('format')};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x==b));if(!cur.err)render()});
+$('#q').oninput=()=>{if(!cur.err&&cur.text)render()};
+inp.oninput=()=>{clearTimeout(inp.t);inp.t=setTimeout(live,250)};
+const pos=()=>{let b=inp.value.slice(0,inp.selectionStart).split('\n');$('#pos').textContent='Ln '+b.length+', Col '+(b[b.length-1].length+1)};
+['keyup','click'].forEach(e=>inp.addEventListener(e,pos));
+$('#wr').onchange=e=>{inp.style.whiteSpace=e.target.checked?'pre-wrap':'pre';inp.wrap=e.target.checked?'soft':'off'};inp.wrap='off';
+$('#cl').onclick=()=>{inp.value='';cur={text:''};render();live();inp.focus()};
+$('#sm').onclick=()=>{let f=$('#fmt').value;inp.value=SM[f=='auto'?'json':f];live();run('format',0)};
+$('#up').onclick=()=>$('#fi').click();
+const load=f=>{if(!f)return;let r=new FileReader();r.onload=()=>{inp.value=r.result;let x=f.name.split('.').pop().toLowerCase();$('#fmt').value={json:'json',yml:'yaml',yaml:'yaml',xml:'xml',csv:'csv'}[x]||'auto';live();run('format',0)};r.readAsText(f)};
+$('#fi').onchange=e=>load(e.target.files[0]);
+inp.ondragover=e=>e.preventDefault();inp.ondrop=e=>{e.preventDefault();load(e.dataTransfer.files[0])};
+$('#cp').onclick=async()=>{let s=cur.shown||'';try{await navigator.clipboard.writeText(s)}catch(e){let t=document.createElement('textarea');t.value=s;document.body.append(t);t.select();document.execCommand('copy');t.remove()}$('#cp').textContent='✓ Copied';setTimeout(()=>$('#cp').textContent='📋 Copy',1200)};
+$('#dl').onclick=()=>{if(!cur.shown)return;let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([cur.shown],{type:'text/plain'}));a.download='formatted.'+({json:'json',yaml:'yaml',xml:'xml',csv:'csv'}[cur.fmt]||'txt');a.click();URL.revokeObjectURL(a.href)};
+$('#sw').onclick=()=>{if(cur.shown){inp.value=cur.shown;live()}};
+$('#bt').onclick=()=>{let t=document.documentElement.dataset.theme=='light'?'dark':'light';document.documentElement.dataset.theme=t;LS.s('ff_t',t)};
+document.documentElement.dataset.theme=LS.g('ff_t')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+$('#bh').onclick=()=>{let h=JSON.parse(LS.g('ff_h')||'[]');dlgShow('History (stored locally)',h.length?h.map((x,i)=>'<div class="hi" data-i="'+i+'"><b>'+x.f.toUpperCase()+'</b> · '+esc(x.d)+'<br>'+esc(x.t.slice(0,70).replace(/\n/g,' '))+'</div>').join(''):'<small>No history yet.</small>');
+ document.querySelectorAll('.hi').forEach(e=>e.onclick=()=>{inp.value=h[e.dataset.i].t;dlg.close();live();run('format',0)})};
+$('#bk').onclick=()=>dlgShow('About FormatForge','<p>Offline validator, formatter and converter for JSON, YAML, XML and CSV. Everything runs in your browser — no network calls, no telemetry. Host it on any internal web server or just open the file.</p><p><b>Shortcuts</b><br>Ctrl/⌘ + Enter → Format<br>Ctrl/⌘ + Shift + M → Minify<br>Ctrl/⌘ + Shift + V → Validate</p><p><b>Query</b> examples: <code>$.users[0].name</code>, <code>$.users[*].id</code></p><p><b>Notes</b>: YAML support covers the common subset (maps, lists, inline collections, block scalars; no anchors/tags). XML is converted via attributes as <code>@attr</code> and text as <code>#text</code>; comments are not preserved.</p><p>Developed by <b>Habib AlMawali</b></p>');
+$('#ver').onclick=()=>dlgShow('Change log','<div class="rel"><h4>v'+VER+' <small>· 22 Nov 2026 · Initial release</small></h4><ul><li>Validate, format and minify JSON, YAML, XML and CSV</li><li>Auto-detect format; live validation with line/column errors and context</li><li>Convert between all four formats</li><li>Sort keys, Repair JSON (comments, trailing commas, single quotes, unquoted keys)</li><li>Collapsible tree view and JSONPath-style query</li><li>Text tools: Base64, string escape, URL encode/decode</li><li>Open or drag-and-drop files, copy, save output, use output as input</li><li>Local history, light/dark theme, responsive layout for desktop and mobile</li><li>Fully offline single file — no external requests</li></ul></div>');
+addEventListener('keydown',e=>{let m=e.ctrlKey||e.metaKey;if(m&&e.key=='Enter'){e.preventDefault();run('format')}else if(m&&e.shiftKey&&e.key.toLowerCase()=='m'){e.preventDefault();run('minify')}else if(m&&e.shiftKey&&e.key.toLowerCase()=='v'){e.preventDefault();run('validate')}});
+$('#ver').textContent='v'+VER;$('#fv').textContent='v'+VER;live();
+</script></body></html>

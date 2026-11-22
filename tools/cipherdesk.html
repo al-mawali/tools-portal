@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CipherDesk – Offline Encryption Toolkit</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'none'">
+<style>
+:root{--bg:#0a0c1a;--panel:rgba(255,255,255,.055);--line:rgba(255,255,255,.12);--tx:#eef0ff;--mut:#9aa0c8;--a:#7c5cff;--b:#22e3d0;--c:#ff4fa3;--field:rgba(0,0,0,.35);--ok:#3ddc97;--err:#ff6b81;color-scheme:dark}
+:root[data-theme=light]{--bg:#eef0fb;--panel:rgba(255,255,255,.8);--line:rgba(30,30,80,.15);--tx:#16183a;--mut:#5a5f8a;--field:rgba(255,255,255,.9);color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tx);background:var(--bg);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 10% -5%,rgba(124,92,255,.35),transparent),radial-gradient(500px 400px at 100% 10%,rgba(34,227,208,.2),transparent),radial-gradient(500px 400px at 60% 110%,rgba(255,79,163,.18),transparent)}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;padding:22px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;backdrop-filter:blur(14px)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em;margin-bottom:14px}
+.logo i{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--a),var(--b));display:grid;place-items:center;font-style:normal;box-shadow:0 6px 24px rgba(124,92,255,.5)}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{all:unset;cursor:pointer;padding:10px 12px;border-radius:12px;color:var(--mut);display:flex;gap:10px;align-items:center;font-weight:600;transition:.2s}
+nav button:hover{background:var(--panel);color:var(--tx)}
+nav button.on{background:linear-gradient(90deg,rgba(124,92,255,.35),rgba(34,227,208,.12));color:var(--tx);box-shadow:inset 0 0 0 1px var(--line)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.side-foot{margin-top:auto;font-size:12px;color:var(--mut)}
+.side-foot a,.link{color:var(--b);cursor:pointer;background:none;border:0;padding:0;font:inherit;text-decoration:underline}
+main{padding:28px clamp(16px,4vw,48px) 60px;max-width:1100px;width:100%;margin:0 auto}
+header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:22px}
+h1{margin:0;font-size:clamp(26px,4vw,40px);letter-spacing:-.03em;line-height:1.1;background:linear-gradient(90deg,var(--tx),var(--b) 60%,var(--c));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);margin:6px 0 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;backdrop-filter:blur(12px);margin-bottom:16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+label{display:block;font-size:13px;color:var(--mut);margin:0 0 6px;font-weight:600}
+input,select,textarea{width:100%;background:var(--field);color:var(--tx);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit}
+textarea{min-height:130px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+input[type=checkbox]{width:auto;accent-color:var(--a)}
+input[type=range]{padding:0;accent-color:var(--a)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--tx);padding:10px 16px;border-radius:12px;font:inherit;font-weight:700;transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn.p{background:linear-gradient(135deg,var(--a),#5b8cff);border:0;box-shadow:0 8px 22px rgba(124,92,255,.4)}
+.btn.g{background:linear-gradient(135deg,var(--c),var(--a));border:0;box-shadow:0 8px 22px rgba(255,79,163,.3)}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:4px;height:34px}
+.meter{height:6px;border-radius:9px;background:var(--line);margin-top:8px;overflow:hidden}
+.meter b{display:block;height:100%;width:0;transition:.3s;background:var(--err)}
+.hint{font-size:12px;color:var(--mut);margin-top:6px}
+.panel{display:none}.panel.on{display:block;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:28px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+.foot b{color:var(--tx)}
+.drop{border:2px dashed var(--line);border-radius:18px;padding:28px;text-align:center;color:var(--mut);cursor:pointer;transition:.2s}
+.drop.over,.drop:hover{border-color:var(--b);background:rgba(34,227,208,.07)}
+.hash{display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:10px 0;word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.hash span:first-child{font-family:inherit;font-weight:700;min-width:64px}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;background:rgba(34,227,208,.15);color:var(--b)}
+#toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#111428;color:#fff;border:1px solid var(--line);padding:10px 18px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.err{border-color:var(--err)}#toast.ok{border-color:var(--ok)}
+dialog{background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:22px;max-width:560px;width:92%;padding:24px;max-height:85vh}
+dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+.ver{border-left:2px solid var(--a);padding-left:14px;margin:14px 0}
+.ver h4{margin:0 0 4px}.ver ul{margin:6px 0 0;padding-left:18px;color:var(--mut)}
+#theme{all:unset;cursor:pointer;width:42px;height:42px;border-radius:13px;background:var(--panel);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+@media(max-width:860px){
+.app{display:block}
+aside{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;padding:8px 8px calc(8px + env(safe-area-inset-bottom));border:0;border-top:1px solid var(--line);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent)}
+.logo,.side-foot{display:none}
+nav{flex-direction:row;overflow-x:auto;width:100%;gap:2px;scrollbar-width:none}
+nav button{flex-direction:column;gap:2px;font-size:11px;padding:7px 11px;min-width:64px;text-align:center;align-items:center}
+nav button span{font-size:18px}
+main{padding-bottom:110px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="logo"><i>🔐</i>CipherDesk</div>
+ <nav id="nav"></nav>
+ <div class="side-foot">v<span class="ver-n"></span> · Developed by <b>Habib AlMawali</b><br><button class="link" onclick="$('log').showModal()">What’s new</button></div>
+</aside>
+<main>
+ <header class="top">
+  <div><h1 id="title">Encrypt text</h1><p class="sub" id="sub"></p></div>
+  <div style="display:flex;gap:8px;align-items:center">
+   <button class="btn" onclick="$('log').showModal()" title="Version change log" style="padding:9px 12px">v<span class="ver-n"></span> · Change log</button>
+   <button id="theme" title="Toggle theme" aria-label="Toggle theme">🌓</button>
+  </div>
+ </header>
+
+ <!-- TEXT -->
+ <section class="panel" id="p-text">
+  <div class="card">
+   <div class="grid">
+    <div><label>Algorithm</label><select id="t-mode"></select></div>
+    <div><label>Key stretching (PBKDF2-SHA256)</label><select id="t-iter"></select></div>
+   </div>
+   <div style="margin-top:14px"><label>Passphrase</label>
+    <div class="pw"><input id="t-pw" type="password" autocomplete="off" placeholder="Enter a strong passphrase"><button class="btn" data-eye="t-pw" type="button">👁</button></div>
+    <div class="meter"><b id="t-meter"></b></div><div class="hint" id="t-ent"></div></div>
+   <div style="margin-top:14px"><label>Input</label><textarea id="t-in" placeholder="Paste plain text, or Base64 ciphertext to decrypt…"></textarea></div>
+   <div class="row"><button class="btn p" id="t-enc">🔒 Encrypt</button><button class="btn g" id="t-dec">🔓 Decrypt</button><button class="btn" id="t-swap">⇅ Use output as input</button><button class="btn" id="t-clr">Clear</button></div>
+  </div>
+  <div class="card"><label>Output</label><textarea id="t-out" readonly></textarea><div class="row"><button class="btn" data-copy="t-out">Copy</button><button class="btn" data-save="t-out" data-name="output.txt">Save .txt</button></div></div>
+ </section>
+
+ <!-- FILE -->
+ <section class="panel" id="p-file">
+  <div class="card">
+   <div class="drop" id="drop">📁 Drop a file here or tap to choose<div class="hint" id="f-name">Nothing selected. Files never leave this device.</div></div>
+   <input type="file" id="f-in" hidden>
+   <div class="grid" style="margin-top:14px">
+    <div><label>Algorithm</label><select id="f-mode"></select></div>
+    <div><label>Passphrase</label><div class="pw"><input id="f-pw" type="password" autocomplete="off"><button class="btn" data-eye="f-pw" type="button">👁</button></div></div>
+   </div>
+   <div class="row"><button class="btn p" id="f-enc">🔒 Encrypt file</button><button class="btn g" id="f-dec">🔓 Decrypt file</button></div>
+   <div class="hint">Encrypted files get a .cdesk extension and carry their own settings, so decryption is automatic.</div>
+  </div>
+ </section>
+
+ <!-- RSA -->
+ <section class="panel" id="p-rsa">
+  <div class="card">
+   <div class="row" style="margin-top:0"><select id="r-size" style="width:auto"><option>2048</option><option>3072</option><option>4096</option></select><button class="btn p" id="r-gen">⚡ Generate RSA-OAEP key pair</button></div>
+   <div class="grid" style="margin-top:14px">
+    <div><label>Public key (PEM)</label><textarea id="r-pub"></textarea></div>
+    <div><label>Private key (PEM) – keep secret</label><textarea id="r-prv"></textarea></div>
+   </div>
+   <div class="row"><button class="btn" data-copy="r-pub">Copy public</button><button class="btn" data-copy="r-prv">Copy private</button><button class="btn" data-save="r-pub" data-name="public.pem">Save public</button><button class="btn" data-save="r-prv" data-name="private.pem">Save private</button></div>
+  </div>
+  <div class="card"><label>Message (or Base64 ciphertext)</label><textarea id="r-in"></textarea>
+   <div class="row"><button class="btn p" id="r-enc">🔒 Encrypt with public key</button><button class="btn g" id="r-dec">🔓 Decrypt with private key</button></div>
+   <label style="margin-top:14px">Output</label><textarea id="r-out" readonly></textarea><div class="row"><button class="btn" data-copy="r-out">Copy</button></div>
+   <div class="hint">RSA-OAEP (SHA-256) handles short messages only (≈190 bytes at 2048-bit). Use Text mode for longer data.</div></div>
+ </section>
+
+ <!-- HASH -->
+ <section class="panel" id="p-hash">
+  <div class="card">
+   <label>Text</label><textarea id="h-in" placeholder="Type text to hash…"></textarea>
+   <div class="row"><button class="btn" id="h-file">Hash a file instead</button><input type="file" id="h-fi" hidden></div>
+   <div style="margin-top:14px"><label>HMAC key (optional – turns hashes into HMAC)</label><input id="h-key" autocomplete="off"></div>
+   <div id="h-out" style="margin-top:12px"></div>
+   <div class="row"><label style="margin:0">Verify against hash:</label><input id="h-cmp" placeholder="Paste expected hash" style="flex:1;min-width:200px"><span id="h-res"></span></div>
+  </div>
+ </section>
+
+ <!-- ENCODE -->
+ <section class="panel" id="p-enc">
+  <div class="card">
+   <div class="grid"><div><label>Format</label><select id="e-op"><option value="b64">Base64</option><option value="b64u">Base64 URL-safe</option><option value="hex">Hex</option><option value="bin">Binary</option><option value="url">URL percent-encoding</option></select></div></div>
+   <div style="margin-top:14px"><label>Input</label><textarea id="e-in"></textarea></div>
+   <div class="row"><button class="btn p" id="e-do">Encode</button><button class="btn g" id="e-un">Decode</button><button class="btn" id="e-sw">⇅ Swap</button></div>
+  </div>
+  <div class="card"><label>Output</label><textarea id="e-out" readonly></textarea><div class="row"><button class="btn" data-copy="e-out">Copy</button></div></div>
+ </section>
+
+ <!-- CLASSIC -->
+ <section class="panel" id="p-cls">
+  <div class="card">
+   <div class="grid"><div><label>Cipher</label><select id="c-op"><option value="caesar">Caesar</option><option value="rot13">ROT13</option><option value="atbash">Atbash</option><option value="vig">Vigenère</option><option value="xor">XOR (hex output)</option></select></div>
+   <div><label>Key / shift</label><input id="c-key" value="3"></div></div>
+   <div style="margin-top:14px"><label>Input</label><textarea id="c-in"></textarea></div>
+   <div class="row"><button class="btn p" id="c-do">Encrypt</button><button class="btn g" id="c-un">Decrypt</button></div>
+   <label style="margin-top:14px">Output</label><textarea id="c-out" readonly></textarea><div class="row"><button class="btn" data-copy="c-out">Copy</button></div>
+   <div class="hint">Classic ciphers are for learning and puzzles only. They offer no real security.</div>
+  </div>
+ </section>
+
+ <!-- GENERATE -->
+ <section class="panel" id="p-gen">
+  <div class="card">
+   <label>Password length: <b id="g-len-v">20</b></label><input type="range" id="g-len" min="8" max="64" value="20">
+   <div class="row"><label><input type="checkbox" id="g-up" checked> A–Z</label><label><input type="checkbox" id="g-lo" checked> a–z</label><label><input type="checkbox" id="g-nu" checked> 0–9</label><label><input type="checkbox" id="g-sy" checked> Symbols</label></div>
+   <div class="row"><input id="g-pw" readonly style="flex:1;min-width:200px;font-family:ui-monospace,monospace"><button class="btn p" id="g-go">Generate</button><button class="btn" data-copy="g-pw">Copy</button></div>
+   <div class="meter"><b id="g-meter"></b></div><div class="hint" id="g-ent"></div>
+  </div>
+  <div class="card"><div class="grid">
+   <div><label>Random key (256-bit hex)</label><input id="g-key" readonly><div class="row"><button class="btn" id="g-k">Generate</button><button class="btn" data-copy="g-key">Copy</button></div></div>
+   <div><label>UUID v4</label><input id="g-id" readonly><div class="row"><button class="btn" id="g-u">Generate</button><button class="btn" data-copy="g-id">Copy</button></div></div>
+  </div></div>
+ </section>
+ <footer class="foot">
+  <span>CipherDesk v<span class="ver-n"></span> · Developed by <b>Habib AlMawali</b></span>
+  <button class="link" onclick="$('log').showModal()">Version change log</button>
+ </footer>
+</main>
+</div>
+
+<dialog id="log"><h2 style="margin-top:0">Change log</h2>
+ <div class="ver"><h4>v<span class="ver-n"></span> <span class="tag">Latest</span> <small style="color:var(--mut)">22 Nov 2026</small></h4><ul>
+  <li>Initial release: fully offline, single-file, zero dependencies</li>
+  <li>Text encryption: AES-256/128-GCM, AES-256-CBC, AES-256-CTR with PBKDF2</li>
+  <li>File encryption with drag &amp; drop, self-describing .cdesk format</li>
+  <li>RSA-OAEP key generation, encryption and decryption (PEM import/export)</li>
+  <li>SHA-1/256/384/512 hashes, HMAC, file hashing and hash verification</li>
+  <li>Base64, Base64URL, Hex, Binary and URL encoders</li>
+  <li>Classic ciphers: Caesar, ROT13, Atbash, Vigenère, XOR</li>
+  <li>Password, key and UUID generators with entropy meter</li>
+  <li>Responsive layout, dark/light theme, strict no-network policy</li>
+ </ul></div>
+ <p style="color:var(--mut);font-size:13px">Developed by <b style="color:var(--tx)">Habib AlMawali</b></p>
+ <div class="row"><button class="btn p" onclick="$('log').close()">Close</button></div>
+</dialog>
+<div id="toast"></div>
+
+<script>
+const VERSION="1.0.0",AUTHOR="Habib AlMawali";
+const $=id=>document.getElementById(id),E=new TextEncoder,D=new TextDecoder;
+document.querySelectorAll('.ver-n').forEach(e=>e.textContent=VERSION);
+const toB64=b=>{let s='',a=new Uint8Array(b);for(let i=0;i<a.length;i+=8192)s+=String.fromCharCode.apply(null,a.subarray(i,i+8192));return btoa(s)};
+const fromB64=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'')),c=>c.charCodeAt(0));
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const unhex=h=>new Uint8Array(h.replace(/\s/g,'').match(/../g).map(x=>parseInt(x,16)));
+const cat=a=>{const o=new Uint8Array(a.reduce((n,x)=>n+x.length,0));let p=0;a.forEach(x=>{o.set(x,p);p+=x.length});return o};
+let tt;const toast=(m,t='ok')=>{const e=$('toast');e.textContent=m;e.className='show '+t;clearTimeout(tt);tt=setTimeout(()=>e.className='',2200)};
+const guard=f=>async(...a)=>{try{await f(...a)}catch(e){toast(e.name==='OperationError'||e.name==='InvalidCharacterError'||e.name==='InvalidAccessError'?'Failed: wrong key, passphrase or corrupted data':e.message||'Error','err')}};
+
+/* navigation */
+const TABS=[['text','📝','Text','Encrypt text','Passphrase-based AES encryption. Decryption detects the settings automatically.'],['file','📁','Files','Encrypt files','Protect any file locally. Nothing is uploaded.'],['rsa','🔑','RSA','RSA key pairs','Generate keys and exchange short secrets with public-key crypto.'],['hash','#️⃣','Hash','Hash & HMAC','Fingerprint text or files and verify integrity.'],['enc','↔️','Encode','Encoders','Convert between common encodings. Encoding is not encryption.'],['cls','🧩','Classic','Classic ciphers','Historic ciphers for learning and puzzles.'],['gen','⚡','Generate','Generators','Strong passwords, random keys and UUIDs from the system CSPRNG.']];
+TABS.forEach(([id,ic,n,t,s])=>{const b=document.createElement('button');b.innerHTML=`<span>${ic}</span>${n}`;b.onclick=()=>show(id);b.dataset.id=id;$('nav').appendChild(b)});
+function show(id){const t=TABS.find(x=>x[0]===id);document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.id===id));$('title').textContent=t[3];$('sub').textContent=t[4];location.hash=id;scrollTo(0,0)}
+
+/* theme */
+const th=localStorage.getItem('cd-theme');if(th)document.documentElement.dataset.theme=th;
+$('theme').onclick=()=>{const n=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=n;try{localStorage.setItem('cd-theme',n)}catch(e){}};
+
+/* generic buttons */
+document.addEventListener('click',e=>{const t=e.target.closest('[data-eye],[data-copy],[data-save]');if(!t)return;
+ if(t.dataset.eye){const i=$(t.dataset.eye);i.type=i.type==='password'?'text':'password'}
+ if(t.dataset.copy){const v=$(t.dataset.copy).value;if(!v)return toast('Nothing to copy','err');(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).catch(()=>{$(t.dataset.copy).select();document.execCommand('copy')}).then?.(()=>0);toast('Copied')}
+ if(t.dataset.save){const v=$(t.dataset.save).value;if(!v)return toast('Nothing to save','err');dl(E.encode(v),t.dataset.name)}});
+const dl=(data,name)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e4)};
+
+/* entropy meter */
+function entropy(s){let c=0;if(/[a-z]/.test(s))c+=26;if(/[A-Z]/.test(s))c+=26;if(/\d/.test(s))c+=10;if(/[^a-zA-Z0-9]/.test(s))c+=33;return c?Math.round(s.length*Math.log2(c)):0}
+function meter(m,h,s){const b=entropy(s),p=Math.min(100,b/1.2);$(m).style.width=p+'%';$(m).style.background=b<40?'var(--err)':b<70?'#ffb84d':'var(--ok)';$(h).textContent=s?`≈ ${b} bits · ${b<40?'weak':b<70?'fair':b<100?'strong':'excellent'}`:''}
+$('t-pw').oninput=e=>meter('t-meter','t-ent',e.target.value);
+
+/* AES core */
+const MODES=[['AES-GCM',256,'AES-256-GCM (recommended, authenticated)'],['AES-GCM',128,'AES-128-GCM (authenticated)'],['AES-CBC',256,'AES-256-CBC (not authenticated)'],['AES-CTR',256,'AES-256-CTR (not authenticated)']];
+const ITERS=[100000,310000,600000,1000000];
+['t-mode','f-mode'].forEach(i=>MODES.forEach((m,k)=>$(i).add(new Option(m[2],k))));
+ITERS.forEach((n,k)=>$('t-iter').add(new Option(n.toLocaleString()+' iterations'+(k==1?' (default)':''),k)));$('t-iter').value=1;
+const par=(a,iv)=>a==='AES-CTR'?{name:a,counter:iv,length:64}:{name:a,iv};
+const ivLen=a=>a==='AES-GCM'?12:16;
+async function derive(pw,salt,a,bits,it){const k=await crypto.subtle.importKey('raw',E.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:it,hash:'SHA-256'},k,{name:a,length:bits},false,['encrypt','decrypt'])}
+async function seal(data,pw,m,it){if(!pw)throw Error('Enter a passphrase');const[a,bits]=MODES[m],salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(ivLen(a)));
+ const ct=new Uint8Array(await crypto.subtle.encrypt(par(a,iv),await derive(pw,salt,a,bits,ITERS[it]),data));return cat([new Uint8Array([m,it]),salt,iv,ct])}
+async function unseal(buf,pw){if(!pw)throw Error('Enter a passphrase');const m=buf[0],it=buf[1];if(!MODES[m]||!ITERS[it])throw Error('Not a CipherDesk payload');const[a,bits]=MODES[m],l=ivLen(a);
+ return new Uint8Array(await crypto.subtle.decrypt(par(a,buf.slice(18,18+l)),await derive(pw,buf.slice(2,18),a,bits,ITERS[it]),buf.slice(18+l)))}
+
+$('t-enc').onclick=guard(async()=>{const v=$('t-in').value;if(!v)throw Error('Enter some text');$('t-out').value=toB64(await seal(E.encode(v),$('t-pw').value,+$('t-mode').value,+$('t-iter').value));toast('Encrypted')});
+$('t-dec').onclick=guard(async()=>{$('t-out').value=D.decode(await unseal(fromB64($('t-in').value),$('t-pw').value));toast('Decrypted')});
+$('t-swap').onclick=()=>{$('t-in').value=$('t-out').value;$('t-out').value=''};
+$('t-clr').onclick=()=>{['t-in','t-out','t-pw'].forEach(i=>$(i).value='');meter('t-meter','t-ent','')};
+
+/* files */
+let file=null;const pick=f=>{file=f;$('f-name').textContent=f?`${f.name} · ${(f.size/1024).toFixed(1)} KB`:''};
+$('drop').onclick=()=>$('f-in').click();$('f-in').onchange=e=>pick(e.target.files[0]);
+['dragover','dragenter'].forEach(v=>$('drop').addEventListener(v,e=>{e.preventDefault();$('drop').classList.add('over')}));
+['dragleave','drop'].forEach(v=>$('drop').addEventListener(v,e=>{e.preventDefault();$('drop').classList.remove('over')}));
+$('drop').addEventListener('drop',e=>pick(e.dataTransfer.files[0]));
+$('f-enc').onclick=guard(async()=>{if(!file)throw Error('Choose a file first');const out=await seal(new Uint8Array(await file.arrayBuffer()),$('f-pw').value,+$('f-mode').value,1);dl(out,file.name+'.cdesk');toast('File encrypted')});
+$('f-dec').onclick=guard(async()=>{if(!file)throw Error('Choose a file first');const out=await unseal(new Uint8Array(await file.arrayBuffer()),$('f-pw').value);dl(out,file.name.replace(/\.cdesk$/,'')||'decrypted.bin');toast('File decrypted')});
+
+/* RSA */
+const pem=(b,t)=>`-----BEGIN ${t}-----\n${toB64(b).match(/.{1,64}/g).join('\n')}\n-----END ${t}-----`;
+const unpem=s=>fromB64(s.replace(/-----[^-]+-----/g,'').replace(/\s/g,''));
+$('r-gen').onclick=guard(async()=>{toast('Generating…');await new Promise(r=>setTimeout(r,30));const k=await crypto.subtle.generateKey({name:'RSA-OAEP',modulusLength:+$('r-size').value,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['encrypt','decrypt']);
+ $('r-pub').value=pem(await crypto.subtle.exportKey('spki',k.publicKey),'PUBLIC KEY');$('r-prv').value=pem(await crypto.subtle.exportKey('pkcs8',k.privateKey),'PRIVATE KEY');toast('Key pair ready')});
+$('r-enc').onclick=guard(async()=>{const k=await crypto.subtle.importKey('spki',unpem($('r-pub').value),{name:'RSA-OAEP',hash:'SHA-256'},false,['encrypt']);$('r-out').value=toB64(await crypto.subtle.encrypt('RSA-OAEP',k,E.encode($('r-in').value)));toast('Encrypted')});
+$('r-dec').onclick=guard(async()=>{const k=await crypto.subtle.importKey('pkcs8',unpem($('r-prv').value),{name:'RSA-OAEP',hash:'SHA-256'},false,['decrypt']);$('r-out').value=D.decode(await crypto.subtle.decrypt('RSA-OAEP',k,fromB64($('r-in').value)));toast('Decrypted')});
+
+/* hash */
+const ALGS=['SHA-1','SHA-256','SHA-384','SHA-512'];let hFile=null;
+async function doHash(){const data=hFile?new Uint8Array(await hFile.arrayBuffer()):E.encode($('h-in').value),key=$('h-key').value;let h='';
+ for(const a of ALGS){let d;if(key){const k=await crypto.subtle.importKey('raw',E.encode(key),{name:'HMAC',hash:a},false,['sign']);d=await crypto.subtle.sign('HMAC',k,data)}else d=await crypto.subtle.digest(a,data);
+  h+=`<div class="hash"><span>${key?'HMAC-':''}${a}</span><span class="hv">${hex(d)}</span><button class="btn" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.previousElementSibling.textContent);toast('Copied')">Copy</button></div>`}
+ $('h-out').innerHTML=h;cmp()}
+function cmp(){const v=$('h-cmp').value.trim().toLowerCase();if(!v){$('h-res').textContent='';return}const m=[...document.querySelectorAll('.hv')].some(e=>e.textContent===v);$('h-res').innerHTML=m?'<span class="tag">✔ match</span>':'<span class="tag" style="background:rgba(255,107,129,.18);color:var(--err)">✘ no match</span>'}
+['h-in','h-key'].forEach(i=>$(i).oninput=()=>{hFile=null;guard(doHash)()});$('h-cmp').oninput=cmp;
+$('h-file').onclick=()=>$('h-fi').click();$('h-fi').onchange=e=>{hFile=e.target.files[0];$('h-in').value='';$('h-in').placeholder='File: '+hFile.name;guard(doHash)()};
+guard(doHash)();
+
+/* encoders */
+const BIN={enc:s=>[...E.encode(s)].map(b=>b.toString(2).padStart(8,'0')).join(' '),dec:s=>D.decode(Uint8Array.from(s.trim().split(/\s+/),b=>parseInt(b,2)))};
+const OPS={b64:[s=>toB64(E.encode(s)),s=>D.decode(fromB64(s))],b64u:[s=>toB64(E.encode(s)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),s=>D.decode(fromB64(s))],hex:[s=>hex(E.encode(s)),s=>D.decode(unhex(s))],bin:[BIN.enc,BIN.dec],url:[encodeURIComponent,decodeURIComponent]};
+$('e-do').onclick=guard(()=>{$('e-out').value=OPS[$('e-op').value][0]($('e-in').value)});
+$('e-un').onclick=guard(()=>{$('e-out').value=OPS[$('e-op').value][1]($('e-in').value)});
+$('e-sw').onclick=()=>{$('e-in').value=$('e-out').value;$('e-out').value=''};
+
+/* classic */
+const shift=(s,n)=>s.replace(/[a-z]/gi,c=>{const b=c<'a'?65:97;return String.fromCharCode((c.charCodeAt(0)-b+n%26+26)%26+b)});
+function classic(dir){const s=$('c-in').value,k=$('c-key').value,op=$('c-op').value;
+ if(op==='caesar')return shift(s,(parseInt(k)||0)*dir);if(op==='rot13')return shift(s,13);
+ if(op==='atbash')return s.replace(/[a-z]/gi,c=>{const b=c<'a'?65:97;return String.fromCharCode(b+25-(c.charCodeAt(0)-b))});
+ if(op==='vig'){const key=k.replace(/[^a-z]/gi,'').toLowerCase();if(!key)throw Error('Enter a letter key');let i=0;return s.replace(/[a-z]/gi,c=>shift(c,(key.charCodeAt(i++%key.length)-97)*dir))}
+ if(!k)throw Error('Enter a key');const kb=E.encode(k);
+ if(dir>0){const b=E.encode(s);return hex(b.map((x,i)=>x^kb[i%kb.length]))}
+ return D.decode(unhex(s).map((x,i)=>x^kb[i%kb.length]))}
+$('c-do').onclick=guard(()=>{$('c-out').value=classic(1)});$('c-un').onclick=guard(()=>{$('c-out').value=classic(-1)});
+
+/* generators */
+const rnd=n=>{const a=new Uint32Array(1),lim=Math.floor(2**32/n)*n;do crypto.getRandomValues(a);while(a[0]>=lim);return a[0]%n};
+function genPw(){const sets=[['g-up','ABCDEFGHIJKLMNOPQRSTUVWXYZ'],['g-lo','abcdefghijklmnopqrstuvwxyz'],['g-nu','0123456789'],['g-sy','!@#$%^&*()-_=+[]{};:,.?']].filter(s=>$(s[0]).checked).map(s=>s[1]);if(!sets.length)return toast('Pick at least one set','err');
+ const all=sets.join(''),L=+$('g-len').value;let p=sets.map(s=>s[rnd(s.length)]);while(p.length<L)p.push(all[rnd(all.length)]);for(let i=p.length-1;i>0;i--){const j=rnd(i+1);[p[i],p[j]]=[p[j],p[i]]}
+ $('g-pw').value=p.join('');meter('g-meter','g-ent',$('g-pw').value)}
+$('g-len').oninput=()=>{$('g-len-v').textContent=$('g-len').value;genPw()};$('g-go').onclick=genPw;['g-up','g-lo','g-nu','g-sy'].forEach(i=>$(i).onchange=genPw);
+$('g-k').onclick=()=>$('g-key').value=hex(crypto.getRandomValues(new Uint8Array(32)));
+$('g-u').onclick=()=>$('g-id').value=crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=rnd(16);return(c=='x'?r:r&3|8).toString(16)});
+genPw();$('g-k').onclick();$('g-u').onclick();
+
+if(!window.crypto||!crypto.subtle)toast('Web Crypto unavailable: open via https:// or localhost','err');
+show(TABS.some(t=>t[0]===location.hash.slice(1))?location.hash.slice(1):'text');
+</script>
+</body>
+</html>

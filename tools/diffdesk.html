@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DiffDesk – Offline Text Compare</title>
+<style>
+:root{--bg:#0e1116;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;--tx:#e6edf3;--mu:#8b97a5;--ac:#7c9cff;--ac2:#b07cff;
+--del:rgba(255,92,107,.16);--delh:rgba(255,92,107,.42);--add:rgba(52,199,120,.16);--addh:rgba(52,199,120,.42);--chg:rgba(255,184,77,.15);--chgh:rgba(255,184,77,.45);--ph:rgba(255,255,255,.03)}
+:root[data-t=light]{--bg:#f3f5f9;--panel:#fff;--panel2:#eef1f6;--line:#d9dfe8;--tx:#1b2330;--mu:#667286;--ac:#4a6cf7;--ac2:#8a4cf0;--del:rgba(230,50,70,.12);--delh:rgba(230,50,70,.33);--add:rgba(30,160,90,.13);--addh:rgba(30,160,90,.35);--chg:rgba(240,150,20,.14);--chgh:rgba(240,150,20,.38);--ph:rgba(0,0,0,.03)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
+button,select,input{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.2px}
+.logo b{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff;font-size:15px}
+.ver{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mu);cursor:pointer;background:var(--panel2)}
+.ver:hover{border-color:var(--ac);color:var(--ac)}
+.sp{flex:1}
+.btn{background:var(--panel2);border:1px solid var(--line);padding:6px 12px;border-radius:9px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--ac)}.btn:focus-visible,.chip:focus-visible,.ver:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.btn.pri{background:linear-gradient(135deg,var(--ac),var(--ac2));border:0;color:#fff;font-weight:600}
+.tb{display:flex;gap:8px;align-items:center;padding:8px 16px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:99px;border:1px solid var(--line);background:var(--panel);cursor:pointer;user-select:none;color:var(--mu)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.chip.on{color:var(--tx);border-color:var(--ac)}.chip.on i{background:var(--ac);box-shadow:0 0 8px var(--ac)}
+.cnt{color:var(--mu);min-width:90px;text-align:center}
+.menu{position:relative}.menu div{display:none;position:absolute;right:0;top:110%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;z-index:20;min-width:200px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.menu.o div{display:block}.menu div button{display:block;width:100%;text-align:left;background:0;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}.menu div button:hover{background:var(--panel2)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 16px 0}
+.heads{display:grid;grid-template-columns:1fr 58px 1fr;gap:0 8px;margin-bottom:6px}
+.hd{display:flex;gap:8px;align-items:center}.hd input[type=text]{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:6px 10px}
+.hd span{color:var(--mu);font-size:12px;white-space:nowrap}
+.wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 58px 1fr;gap:8px}
+textarea,.pane{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-height:0}
+textarea{resize:none;padding:12px;font:13px/20px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--tx);tab-size:4;white-space:pre;overflow:auto}
+textarea:focus{outline:2px solid var(--ac);outline-offset:-1px}
+.pane{overflow:auto;font:13px/20px ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:4}
+.pane.g{overflow:hidden;background:var(--panel2)}
+.in{min-width:100%;width:max-content}
+.r{height:20px;display:flex;white-space:pre}.r i{flex:none;width:46px;text-align:right;padding-right:10px;color:var(--mu);font-style:normal;user-select:none;opacity:.7;position:sticky;left:0;background:var(--panel)}
+.r span{padding-right:20px}.r.eq i{background:var(--panel)}
+.del{background:var(--del)}.add{background:var(--add)}.chg{background:var(--chg)}.ph{background:repeating-linear-gradient(135deg,var(--ph) 0 6px,transparent 6px 12px)}
+.del i,.add i,.chg i{background:inherit;background-color:var(--panel);background-image:linear-gradient(var(--del),var(--del))}
+.add i{background-image:linear-gradient(var(--add),var(--add))}.chg i{background-image:linear-gradient(var(--chg),var(--chg))}.ph i{background:var(--panel)}
+.r.cur{box-shadow:inset 3px 0 0 var(--ac)}
+mark{background:var(--chgh);color:inherit;border-radius:3px}.del mark{background:var(--delh)}.add mark{background:var(--addh)}
+.sep{height:20px;color:var(--mu);text-align:center;background:var(--panel2);font-size:11px}
+.gr{height:20px;display:flex;justify-content:center;gap:2px;align-items:center}
+.gr button{border:0;background:var(--ac);color:#fff;border-radius:5px;width:22px;height:18px;line-height:14px;cursor:pointer;font-size:13px;padding:0}
+.gr button:hover{background:var(--ac2)}
+.stat{display:flex;gap:16px;align-items:center;padding:8px 16px;color:var(--mu);font-size:12px;border-top:1px solid var(--line);margin-top:8px;flex-wrap:wrap}
+.stat b{color:var(--tx)}.d{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+footer{padding:7px 16px;text-align:center;font-size:12px;color:var(--mu);background:var(--panel);border-top:1px solid var(--line)}
+footer b{background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hide{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50;backdrop-filter:blur(4px)}.modal.o{display:grid}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(560px,92vw);max-height:80vh;overflow:auto;padding:22px}
+.card h2{margin:0 0 4px}.card h3{margin:18px 0 6px;font-size:14px;color:var(--ac)}.card ul{margin:0;padding-left:18px;color:var(--mu)}.card li{margin:3px 0}
+.toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:99px;opacity:0;transition:.25s;pointer-events:none;z-index:60}.toast.o{opacity:1}
+@media (max-width:760px){.wrap,.heads{grid-template-columns:1fr 1fr}.wrap>.g,.heads>.gh{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header>
+ <div class="logo"><b>⇄</b>DiffDesk</div>
+ <button class="ver" id="verB" title="View change log">v1.0.0 · change log</button>
+ <div class="sp"></div>
+ <button class="btn" id="open1">Open left…</button><button class="btn" id="open2">Open right…</button>
+ <button class="btn" id="swap">⇄ Swap</button>
+ <button class="btn" id="clear">Clear</button>
+ <div class="menu" id="exp"><button class="btn" id="expB">Export ▾</button><div>
+  <button data-x="sum">Summary report (.html)</button><button data-x="txt">Summary (.txt)</button>
+  <button data-x="L">Save left file</button><button data-x="R">Save right file</button><button data-x="copyL">Copy left to clipboard</button><button data-x="copyR">Copy right to clipboard</button></div></div>
+ <button class="btn" id="theme" title="Toggle theme">◐</button>
+</header>
+<div class="tb">
+ <button class="btn pri" id="go">Compare</button>
+ <button class="btn" id="edit">✎ Edit text</button>
+ <span class="chip on" id="oSync" tabindex="0" role="switch"><i></i>Sync scroll</span>
+ <span class="chip" id="oWs" tabindex="0" role="switch"><i></i>Ignore whitespace</span>
+ <span class="chip" id="oCase" tabindex="0" role="switch"><i></i>Ignore case</span>
+ <span class="chip" id="oBlank" tabindex="0" role="switch"><i></i>Ignore blank lines</span>
+ <span class="chip" id="oDiff" tabindex="0" role="switch"><i></i>Differences only</span>
+ <div class="sp"></div>
+ <button class="btn" id="prev" title="Alt+↑">▲ Prev</button><span class="cnt" id="cnt">–</span><button class="btn" id="next" title="Alt+↓">▼ Next</button>
+ <button class="btn" id="allR" title="Copy all changes left → right">All ›</button><button class="btn" id="allL" title="Copy all changes right → left">‹ All</button>
+</div>
+<main>
+ <div class="heads"><div class="hd"><input type="text" id="n1" value="Left" aria-label="Left name"><span id="s1"></span></div><div class="gh"></div><div class="hd"><input type="text" id="n2" value="Right" aria-label="Right name"><span id="s2"></span></div></div>
+ <div class="wrap" id="eW"><textarea id="t1" spellcheck="false" placeholder="Paste text, drop a file, or use Open left…"></textarea><div class="g"></div><textarea id="t2" spellcheck="false" placeholder="Paste text, drop a file, or use Open right…"></textarea></div>
+ <div class="wrap hide" id="cW"><div class="pane" id="p1"></div><div class="pane g" id="pg"></div><div class="pane" id="p2"></div></div>
+ <div class="stat" id="stat"></div>
+</main>
+<footer>Developed by <b>Habib AlMawali</b> · DiffDesk v1.0.0 · 100% offline – no data leaves this page</footer>
+<input type="file" id="f1" class="hide"><input type="file" id="f2" class="hide">
+<div class="modal" id="log"><div class="card"><h2>Change log</h2><div style="color:var(--mu)">DiffDesk · Developed by Habib AlMawali</div>
+<h3>v1.0.0 – 19 Nov 2026 · Initial release</h3><ul>
+<li>Side-by-side text compare with aligned rows and line numbers</li><li>Inline highlighting of changed characters inside modified lines</li>
+<li>Sync scroll on/off, differences-only view with context</li><li>Ignore whitespace, case and blank lines options</li>
+<li>Move changes per block (left→right / right→left) or all at once</li><li>Previous/next difference navigation (Alt+↑ / Alt+↓)</li>
+<li>Open files or drag &amp; drop; swap sides; edit text directly</li><li>Export summary report (HTML/TXT), save left/right files, copy</li>
+<li>Dark / light theme; works fully offline from a single file</li></ul>
+<div style="text-align:right;margin-top:16px"><button class="btn pri" id="logX">Close</button></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),O={sync:1,ws:0,ic:0,bl:0,only:0,live:0};
+const T1=$('t1'),T2=$('t2'),P1=$('p1'),P2=$('p2'),PG=$('pg');
+let rows=[],hunks=[],cur=-1,A=[],B=[],mode='edit';
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const split=s=>s===''?[]:s.split(/\r\n|\n|\r/);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('o');clearTimeout(toast.k);toast.k=setTimeout(()=>t.classList.remove('o'),1800)}
+function norm(s){if(O.ws)s=s.replace(/\s+/g,' ').trim();if(O.ic)s=s.toLowerCase();return s}
+function diff(a,b){
+ const ka=a.map(norm),kb=b.map(norm);let s=0;
+ while(s<ka.length&&s<kb.length&&ka[s]===kb[s])s++;
+ let ea=ka.length,eb=kb.length;while(ea>s&&eb>s&&ka[ea-1]===kb[eb-1]){ea--;eb--}
+ const ops=[];for(let i=0;i<s;i++)ops.push(['=',i,i]);
+ const m=ea-s,k=eb-s;
+ if(m*k>25e6||!m||!k){for(let i=s;i<ea;i++)ops.push(['-',i]);for(let j=s;j<eb;j++)ops.push(['+',j])}
+ else{const W=k+1,dp=new Uint32Array((m+1)*W);
+  for(let i=m-1;i>=0;i--)for(let j=k-1;j>=0;j--)dp[i*W+j]=ka[s+i]===kb[s+j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
+  let i=0,j=0;while(i<m&&j<k){if(ka[s+i]===kb[s+j]){ops.push(['=',s+i,s+j]);i++;j++}else if(dp[(i+1)*W+j]>=dp[i*W+j+1]){ops.push(['-',s+i]);i++}else{ops.push(['+',s+j]);j++}}
+  for(;i<m;i++)ops.push(['-',s+i]);for(;j<k;j++)ops.push(['+',s+j])}
+ for(let i=ea,j=eb;i<ka.length;i++,j++)ops.push(['=',i,j]);
+ return ops}
+function build(){
+ A=split(T1.value);B=split(T2.value);
+ const ops=diff(A,B);rows=[];hunks=[];let dl=[],ad=[],pa=0,pb=0;
+ const flush=()=>{if(!dl.length&&!ad.length)return;const h=hunks.length,n=Math.max(dl.length,ad.length);
+  hunks.push({r:rows.length,aS:pa,aE:pa+dl.length,bS:pb,bE:pb+ad.length});
+  for(let x=0;x<n;x++){const l=x<dl.length?dl[x]:-1,r=x<ad.length?ad[x]:-1;rows.push({l,r,t:l>=0&&r>=0?'chg':l>=0?'del':'add',h})}
+  pa+=dl.length;pb+=ad.length;dl=[];ad=[]};
+ for(const o of ops){if(o[0]==='-')dl.push(o[1]);else if(o[0]==='+')ad.push(o[1]);else{flush();rows.push({l:o[1],r:o[2],t:'eq',h:-1});pa++;pb++}}
+ flush();
+ if(O.bl){ // treat hunks made only of blank lines as equal
+  hunks=hunks.filter(h=>{const ls=rows.slice(h.r,h.r+Math.max(h.aE-h.aS,h.bE-h.bS)),blank=ls.every(r=>(r.l<0||!A[r.l].trim())&&(r.r<0||!B[r.r].trim()));if(blank)for(const r of ls)r.t='eq',r.h=-1;return!blank});
+  hunks.forEach((h,i)=>{for(let x=h.r;x<rows.length&&(x===h.r||rows[x].h===rows[h.r].h);x++)rows[x].h=i})}
+ render()}
+function inl(a,b){let p=0;while(p<a.length&&p<b.length&&a[p]===b[p])p++;let q=0;while(q<a.length-p&&q<b.length-p&&a[a.length-1-q]===b[b.length-1-q])q++;
+ const f=(s)=>esc(s.slice(0,p))+(s.length-p-q>0?'<mark>'+esc(s.slice(p,s.length-q))+'</mark>':'')+esc(s.slice(s.length-q));return[f(a),f(b)]}
+function render(){
+ let vis=rows.map(()=>1);
+ if(O.only){vis=rows.map(()=>0);rows.forEach((r,i)=>{if(r.t!=='eq')for(let x=Math.max(0,i-2);x<=Math.min(rows.length-1,i+2);x++)vis[x]=1})}
+ let h1='',h2='',hg='',skip=0,seen={};
+ const sep=()=>{if(skip){const t='<div class="sep">⋯ '+skip+' identical line'+(skip>1?'s':'')+'</div>';h1+=t;h2+=t;hg+='<div class="sep"></div>';skip=0}};
+ rows.forEach((r,i)=>{if(!vis[i]){skip++;return}sep();
+  let L=r.l>=0?esc(A[r.l]):'',R=r.r>=0?esc(B[r.r]):'';
+  if(r.t==='chg')[L,R]=inl(A[r.l],B[r.r]);
+  const c=r.t==='eq'?'eq':r.t,cu=r.h===cur?' cur':'';
+  h1+=`<div class="r ${r.l<0?'ph':c==='add'?'ph':c}${cu}" data-i="${i}"><i>${r.l>=0?r.l+1:''}</i><span>${L}</span></div>`;
+  h2+=`<div class="r ${r.r<0?'ph':c==='del'?'ph':c}${cu}" data-i="${i}"><i>${r.r>=0?r.r+1:''}</i><span>${R}</span></div>`;
+  hg+=r.h>=0&&!seen[r.h]?(seen[r.h]=1,`<div class="gr"><button data-h="${r.h}" data-d="R" title="Copy left → right">›</button><button data-h="${r.h}" data-d="L" title="Copy right → left">‹</button></div>`):'<div class="gr"></div>'});
+ sep();
+ P1.innerHTML='<div class="in">'+h1+'</div>';P2.innerHTML='<div class="in">'+h2+'</div>';PG.innerHTML='<div>'+hg+'</div>';
+ stats()}
+function stats(){
+ const c=x=>rows.filter(r=>r.t===x).length,id=hunks.length;
+ $('cnt').textContent=id?(cur>=0?cur+1:'–')+' / '+id:'No differences';
+ $('stat').innerHTML=id?`<span><b>${id}</b> difference block${id>1?'s':''}</span><span><span class="d" style="background:var(--delh)"></span>${c('del')} left-only</span><span><span class="d" style="background:var(--addh)"></span>${c('add')} right-only</span><span><span class="d" style="background:var(--chgh)"></span>${c('chg')} changed</span><span><b>${rows.length-c('del')-c('add')-c('chg')}</b> identical</span>`:'<span><b>✔ Files are identical</b>'+(O.ws||O.ic||O.bl?' (with current ignore options)':'')+'</span>';
+ $('s1').textContent=A.length+' lines';$('s2').textContent=B.length+' lines'}
+function show(m){mode=m;$('eW').classList.toggle('hide',m!=='edit');$('cW').classList.toggle('hide',m==='edit');$('edit').textContent=m==='edit'?'✎ Editing':'✎ Edit text'}
+function compare(keep){const st=P1.scrollTop;cur=keep?cur:-1;show('cmp');build();if(keep)P1.scrollTop=st}
+function go(n){if(!hunks.length)return;cur=(n+hunks.length)%hunks.length;if(mode!=='cmp')compare();else render();
+ const t=hunks[cur].r;let el=P1.querySelector('[data-i="'+t+'"]');if(el)P1.scrollTop=Math.max(0,el.offsetTop-80);syncFrom(P1);stats()}
+function move(h,d){const H=hunks[h];if(!H)return;
+ if(d==='R'){B.splice(H.bS,H.bE-H.bS,...A.slice(H.aS,H.aE));T2.value=B.join('\n')}else{A.splice(H.aS,H.aE-H.aS,...B.slice(H.bS,H.bE));T1.value=A.join('\n')}
+ compare(1)}
+function moveAll(d){if(!hunks.length)return;const hs=hunks.slice().reverse();
+ for(const H of hs){if(d==='R')B.splice(H.bS,H.bE-H.bS,...A.slice(H.aS,H.aE));else A.splice(H.aS,H.aE-H.aS,...B.slice(H.bS,H.bE))}
+ T1.value=A.join('\n');T2.value=B.join('\n');compare(1);toast('All changes moved '+(d==='R'?'left → right':'right → left'))}
+// scroll sync
+let lock=0;
+function syncFrom(src){if(!O.sync)return;const o=src===P1?P2:P1;lock=1;o.scrollTop=src.scrollTop;o.scrollLeft=src.scrollLeft;PG.scrollTop=src.scrollTop;requestAnimationFrame(()=>lock=0)}
+P1.addEventListener('scroll',()=>{PG.scrollTop=P1.scrollTop;if(!lock)syncFrom(P1)});
+P2.addEventListener('scroll',()=>{if(!lock){if(O.sync)syncFrom(P2);}});
+PG.addEventListener('wheel',e=>{P1.scrollTop+=e.deltaY});
+PG.addEventListener('click',e=>{const b=e.target.closest('button');if(b)move(+b.dataset.h,b.dataset.d)});
+[P1,P2].forEach(p=>p.addEventListener('click',e=>{const r=e.target.closest('.r');if(!r)return;const x=rows[+r.dataset.i];if(x&&x.h>=0){cur=x.h;render();stats()}}));
+// options
+[['oSync','sync'],['oWs','ws'],['oCase','ic'],['oBlank','bl'],['oDiff','only']].forEach(([id,k])=>{
+ const el=$(id),t=()=>{O[k]^=1;el.classList.toggle('on',!!O[k]);el.setAttribute('aria-checked',!!O[k]);if(k==='sync'){toast('Sync scroll '+(O.sync?'on':'off'));if(O.sync)syncFrom(P1)}else if(mode==='cmp')compare(1)};
+ el.onclick=t;el.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();t()}}});
+$('go').onclick=()=>compare();$('edit').onclick=()=>show('edit');
+$('prev').onclick=()=>go(cur-1);$('next').onclick=()=>go(cur+1);
+$('allR').onclick=()=>moveAll('R');$('allL').onclick=()=>moveAll('L');
+$('swap').onclick=()=>{[T1.value,T2.value]=[T2.value,T1.value];[$('n1').value,$('n2').value]=[$('n2').value,$('n1').value];if(mode==='cmp')compare();toast('Sides swapped')};
+$('clear').onclick=()=>{T1.value=T2.value='';$('n1').value='Left';$('n2').value='Right';show('edit');A=B=[];rows=[];hunks=[];stats()};
+[T1,T2].forEach(t=>t.addEventListener('input',()=>{A=split(T1.value);B=split(T2.value);$('s1').textContent=A.length+' lines';$('s2').textContent=B.length+' lines'}));
+document.addEventListener('keydown',e=>{if(e.altKey&&e.key==='ArrowDown'){e.preventDefault();go(cur+1)}else if(e.altKey&&e.key==='ArrowUp'){e.preventDefault();go(cur-1)}else if(e.ctrlKey&&e.key==='Enter')compare()});
+// files
+function load(file,side){if(!file)return;const r=new FileReader();r.onload=()=>{(side==1?T1:T2).value=r.result;$('n'+side).value=file.name;A=split(T1.value);B=split(T2.value);stats();if(mode==='cmp')compare();toast('Loaded '+file.name)};r.readAsText(file)}
+[1,2].forEach(s=>{$('open'+s).onclick=()=>$('f'+s).click();$('f'+s).onchange=e=>{load(e.target.files[0],s);e.target.value=''};
+ const t=s==1?T1:T2;t.addEventListener('dragover',e=>e.preventDefault());t.addEventListener('drop',e=>{if(e.dataTransfer.files.length){e.preventDefault();load(e.dataTransfer.files[0],s)}})});
+// export
+function dl(name,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:type||'text/plain'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function summaryTxt(){A=split(T1.value);B=split(T2.value);if(!rows.length)build();
+ let s=`DiffDesk comparison summary\nDeveloped by Habib AlMawali · v1.0.0\nGenerated: ${new Date().toLocaleString()}\n\nLeft : ${$('n1').value} (${A.length} lines)\nRight: ${$('n2').value} (${B.length} lines)\nOptions: ignore whitespace=${!!O.ws}, ignore case=${!!O.ic}, ignore blank lines=${!!O.bl}\nResult: ${hunks.length?hunks.length+' difference block(s)':'IDENTICAL'}\n`;
+ hunks.forEach((h,i)=>{s+=`\n#${i+1}  left ${h.aE>h.aS?'lines '+(h.aS+1)+'-'+h.aE:'(none, at '+(h.aS+1)+')'}  |  right ${h.bE>h.bS?'lines '+(h.bS+1)+'-'+h.bE:'(none, at '+(h.bS+1)+')'}\n`;A.slice(h.aS,h.aE).forEach(l=>s+='  - '+l+'\n');B.slice(h.bS,h.bE).forEach(l=>s+='  + '+l+'\n')});return s}
+function summaryHtml(){summaryTxt();
+ let b='';hunks.forEach((h,i)=>{b+=`<h3>#${i+1} · left ${h.aE>h.aS?(h.aS+1)+'–'+h.aE:'—'} · right ${h.bE>h.bS?(h.bS+1)+'–'+h.bE:'—'}</h3><table><tr><td class="d">${A.slice(h.aS,h.aE).map(esc).join('\n')||' '}</td><td class="a">${B.slice(h.bS,h.bE).map(esc).join('\n')||' '}</td></tr></table>`});
+ return `<!DOCTYPE html><meta charset="utf-8"><title>Compare summary</title><style>body{font:14px system-ui;margin:30px;color:#1b2330}h1{margin:0}h3{margin:22px 0 6px;font-size:14px}table{width:100%;border-collapse:collapse;table-layout:fixed}td{white-space:pre-wrap;word-break:break-all;vertical-align:top;font:12px/1.5 ui-monospace,Consolas,monospace;padding:8px;border:1px solid #d9dfe8;width:50%}.d{background:#ffe3e6}.a{background:#ddf5e7}.m{color:#667286}</style><h1>Compare summary</h1><p class="m">Generated ${new Date().toLocaleString()} · DiffDesk v1.0.0 · Developed by Habib AlMawali</p><p><b>Left:</b> ${esc($('n1').value)} (${A.length} lines)<br><b>Right:</b> ${esc($('n2').value)} (${B.length} lines)<br><b>Result:</b> ${hunks.length?hunks.length+' difference block(s)':'Identical'}</p>${b}`}
+$('expB').onclick=e=>{e.stopPropagation();$('exp').classList.toggle('o')};document.addEventListener('click',()=>$('exp').classList.remove('o'));
+$('exp').querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const x=b.dataset.x;
+ if(x==='sum')dl('compare-summary.html',summaryHtml(),'text/html');else if(x==='txt')dl('compare-summary.txt',summaryTxt());
+ else if(x==='L')dl($('n1').value||'left.txt',T1.value);else if(x==='R')dl($('n2').value||'right.txt',T2.value);
+ else{navigator.clipboard.writeText(x==='copyL'?T1.value:T2.value).then(()=>toast('Copied'),()=>toast('Clipboard blocked by browser'))}});
+// misc
+$('theme').onclick=()=>{const r=document.documentElement;r.dataset.t=r.dataset.t==='light'?'':'light'};
+$('verB').onclick=()=>$('log').classList.add('o');$('logX').onclick=()=>$('log').classList.remove('o');$('log').onclick=e=>{if(e.target.id==='log')$('log').classList.remove('o')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('log').classList.remove('o')});
+T1.value="function greet(name) {\n  console.log('Hello ' + name);\n  return true;\n}\n\nconst items = [1, 2, 3];\nitems.forEach(i => print(i));\n// end of file";
+T2.value="function greet(name, title) {\n  console.log('Hello ' + title + ' ' + name);\n  return true;\n}\n\nconst items = [1, 2, 3, 4];\nitems.forEach(i => print(i));\nitems.push(5);\n// end of file";
+A=split(T1.value);B=split(T2.value);stats();
+})();
+</script></body></html>

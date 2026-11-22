@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Memory Match</title>
+<style>
+:root{--bg1:#1b1340;--bg2:#3a1d6e;--glass:rgba(255,255,255,.09);--line:rgba(255,255,255,.18);--ink:#f6f2ff;--mute:#b9aedf;--pink:#ff5fa2;--cyan:#38e1ff;--gold:#ffc83d;--ok:#4ff0a6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);background:radial-gradient(900px 600px at 12% 8%,#5b2bb0 0,transparent 60%),radial-gradient(800px 600px at 92% 95%,#0e7da0 0,transparent 55%),linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(1.3rem,3.2vw,2rem);letter-spacing:.5px;font-weight:900}
+h1 span{background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tools{display:flex;gap:8px}
+button,select{font:inherit;color:var(--ink)}
+.btn{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:9px 14px;cursor:pointer;backdrop-filter:blur(10px);transition:transform .12s,background .2s}
+.btn:hover{background:rgba(255,255,255,.17)}.btn:active{transform:scale(.95)}
+.btn.main{background:linear-gradient(135deg,var(--pink),#ff8a4c);border:0;font-weight:800;box-shadow:0 8px 22px rgba(255,95,162,.4)}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.panel{margin:0 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.seg{display:flex;background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:3px;gap:2px}
+.seg button{background:none;border:0;border-radius:11px;padding:7px 12px;cursor:pointer;opacity:.75}
+.seg button[aria-pressed=true]{background:rgba(255,255,255,.22);opacity:1;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 16px;max-width:760px;width:calc(100% - 32px);align-self:center}
+.stat{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:8px 6px;text-align:center;backdrop-filter:blur(10px)}
+.stat b{display:block;font-size:clamp(1.05rem,3vw,1.6rem);font-variant-numeric:tabular-nums}
+.stat small{color:var(--mute);font-size:.72rem}
+.stat.pop b{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.35);color:var(--gold)}}
+main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 16px 10px}
+#board{display:grid;gap:clamp(6px,1.4vw,14px);grid-template-columns:repeat(var(--c),1fr);width:min(100%,calc((100dvh - 290px)*var(--c)/var(--r)),980px);min-width:260px;perspective:900px}
+.card{aspect-ratio:1;border:0;background:none;padding:0;cursor:pointer;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.card.up,.card.done{transform:rotateY(180deg)}
+.f{position:absolute;inset:0;border-radius:18%;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.back{background:linear-gradient(145deg,#7c4dff,#ff5fa2);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.3);font-size:clamp(1rem,4vw,2rem);color:rgba(255,255,255,.5)}
+.card:hover:not(.up):not(.done) .back{filter:brightness(1.15)}
+.face{transform:rotateY(180deg);background:#fff;color:#222;font-size:clamp(1.4rem,6.5vw,3.4rem);box-shadow:0 6px 16px rgba(0,0,0,.3);font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif}
+.card.done .face{background:#d9ffee;box-shadow:0 0 0 3px var(--ok),0 0 22px rgba(79,240,166,.6)}
+.card.bad .face{animation:shake .4s;box-shadow:0 0 0 3px #ff4d6d}
+@keyframes shake{25%{transform:rotateY(180deg) translateX(-6px)}75%{transform:rotateY(180deg) translateX(6px)}}
+.card:disabled{cursor:default}
+#toast{position:fixed;left:50%;top:84px;transform:translateX(-50%);background:var(--gold);color:#2a1a00;font-weight:900;padding:6px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.show{opacity:1}
+footer{text-align:center;color:var(--mute);font-size:.8rem;padding:6px 10px 12px}
+footer a{color:var(--cyan);background:none;border:0;cursor:pointer;text-decoration:underline;font:inherit}
+.modal{position:fixed;inset:0;background:rgba(10,6,30,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}
+.modal.open{display:flex}
+.sheet{background:linear-gradient(160deg,#2a1b5c,#1b1340);border:1px solid var(--line);border-radius:24px;padding:22px;max-width:440px;width:100%;max-height:86dvh;overflow:auto;text-align:center;animation:rise .35s}
+@keyframes rise{from{transform:translateY(24px) scale(.96);opacity:0}}
+.sheet h2{margin:0 0 6px}.sheet .stars{font-size:2.4rem;letter-spacing:6px}
+.sheet table{width:100%;margin:12px 0;border-collapse:collapse}.sheet td{padding:6px;border-bottom:1px solid var(--line)}
+.sheet td:last-child{text-align:right;font-weight:800}
+.log{text-align:left;font-size:.92rem;line-height:1.5}.log h3{margin:.2em 0}.log ul{padding-left:20px;margin:6px 0}
+.tag{background:var(--ok);color:#00331e;border-radius:8px;padding:1px 8px;font-size:.75rem;font-weight:900}
+.row{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.conf{position:fixed;top:-30px;font-size:1.6rem;pointer-events:none;animation:fall linear forwards;z-index:6}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (max-width:520px){.stats{grid-template-columns:repeat(3,1fr)}.btn{padding:8px 11px}#board{width:min(100%,calc((100dvh - 360px)*var(--c)/var(--r)))}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧠 Memory <span>Match</span></h1>
+  <div class="tools">
+    <button class="btn" id="hintB" title="Peek at all cards (costs 50 points)">💡 Hint <span id="hintN">3</span></button>
+    <button class="btn" id="pauseB">⏸ Pause</button>
+    <button class="btn" id="soundB" aria-pressed="true" title="Sound">🔊</button>
+    <button class="btn main" id="newB">New game</button>
+  </div>
+</header>
+
+<div class="panel">
+  <div class="seg" id="themes" role="group" aria-label="Theme">
+    <button data-t="emoji">😀 Emoji</button><button data-t="flags">🏳️ Flags</button><button data-t="office">📎 Office</button>
+  </div>
+  <div class="seg" id="levels" role="group" aria-label="Difficulty">
+    <button data-l="0">Easy</button><button data-l="1">Medium</button><button data-l="2">Hard</button><button data-l="3">Expert</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><b id="score">0</b><small>Score</small></div>
+  <div class="stat"><b id="time">0:00</b><small>Time</small></div>
+  <div class="stat"><b id="moves">0</b><small>Moves</small></div>
+  <div class="stat"><b id="combo">x1</b><small>Combo</small></div>
+  <div class="stat"><b id="best">-</b><small>Best</small></div>
+</div>
+<div id="toast"></div>
+
+<main><div id="board" role="grid" aria-label="Memory board"></div></main>
+
+<footer>Developed by <strong>Habib AlMawali</strong> · <a id="verB">v1.0.0 · What's new</a> · Works offline</footer>
+
+<div class="modal" id="winM"><div class="sheet" role="dialog" aria-modal="true">
+  <h2 id="winT">Well done!</h2><div class="stars" id="stars"></div>
+  <table>
+    <tr><td>Matches</td><td id="wM"></td></tr><tr><td>Moves</td><td id="wMv"></td></tr>
+    <tr><td>Time</td><td id="wT"></td></tr><tr><td>Time bonus</td><td id="wB"></td></tr>
+    <tr><td>Final score</td><td id="wS"></td></tr>
+  </table>
+  <div id="newBest"></div>
+  <div class="row"><button class="btn main" id="againB">Play again</button><button class="btn" id="closeW">Close</button></div>
+</div></div>
+
+<div class="modal" id="pauseM"><div class="sheet"><h2>Paused</h2><p>Cards are hidden while the game is paused.</p><div class="row"><button class="btn main" id="resumeB">Resume</button></div></div></div>
+
+<div class="modal" id="verM"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>Version history</h2>
+  <div class="log">
+    <h3>v1.0.0 <span class="tag">Current</span> · 2026-11-19</h3>
+    <ul>
+      <li>First release: flip-card memory game</li>
+      <li>Themes: Emoji, Flags, Office items</li>
+      <li>4 difficulty levels (6 to 18 pairs)</li>
+      <li>Score with combo streak, timer, moves and time bonus</li>
+      <li>Best score saved per theme and level on this device</li>
+      <li>Hints (3 per game), pause and sound toggle</li>
+      <li>Responsive layout for phones, tablets and large screens</li>
+      <li>Fully offline: one file, no internet or external calls</li>
+    </ul>
+  </div>
+  <p style="color:var(--mute);font-size:.85rem">Developed by Habib AlMawali</p>
+  <div class="row"><button class="btn main" id="closeV">Close</button></div>
+</div></div>
+
+<script>
+(function(){
+"use strict";
+var SETS={
+ emoji:["🐶","🐱","🦊","🐼","🦁","🐸","🐙","🦋","🍕","🍔","🍩","🚀","🎸","⚽","🌵","🍉","🦄","🐳"],
+ flags:["🇴🇲","🇸🇦","🇦🇪","🇺🇸","🇬🇧","🇫🇷","🇩🇪","🇯🇵","🇨🇳","🇮🇳","🇧🇷","🇨🇦","🇦🇺","🇪🇬","🇹🇷","🇮🇹","🇪🇸","🇶🇦"],
+ office:["📎","🖇️","📌","📏","✂️","🖊️","📒","💻","🖨️","☎️","🗂️","📊","🗓️","🔍","💼","📮","⌨️","🖱️"]
+};
+var LV=[{p:6,c:4,r:3,par:40},{p:8,c:4,r:4,par:60},{p:12,c:6,r:4,par:100},{p:18,c:6,r:6,par:160}];
+var $=function(i){return document.getElementById(i)};
+var S={theme:"emoji",level:1,sound:true,store:{}};
+try{var sv=JSON.parse(localStorage.getItem("mm_v1")||"{}");for(var k in sv)S[k]=sv[k];}catch(e){}
+function save(){try{localStorage.setItem("mm_v1",JSON.stringify({theme:S.theme,level:S.level,sound:S.sound,store:S.store}))}catch(e){}}
+var g={}, timer=null, ac=null;
+
+function beep(f,d,t){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),v=ac.createGain();o.type=t||"sine";o.frequency.value=f;v.gain.setValueAtTime(.12,ac.currentTime);v.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){}}
+function fmt(s){return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2)}
+function key(){return S.theme+"-"+S.level}
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("show")},900)}
+function bump(id){var p=$(id).parentNode;p.classList.remove("pop");void p.offsetWidth;p.classList.add("pop")}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function ui(){
+ [].forEach.call(document.querySelectorAll("#themes button"),function(b){b.setAttribute("aria-pressed",b.dataset.t===S.theme)});
+ [].forEach.call(document.querySelectorAll("#levels button"),function(b){b.setAttribute("aria-pressed",+b.dataset.l===S.level)});
+ $("soundB").textContent=S.sound?"🔊":"🔇";
+}
+function showBest(){var b=S.store[key()];$("best").textContent=b?b.score:"-"}
+
+function newGame(){
+ clearInterval(timer);var L=LV[S.level];
+ var pick=shuffle(SETS[S.theme].slice()).slice(0,L.p);
+ var deck=shuffle(pick.concat(pick));
+ g={deck:deck,open:[],lock:false,matched:0,moves:0,score:0,combo:0,t:0,hints:3,started:false,paused:false,over:false,L:L};
+ var b=$("board");b.style.setProperty("--c",L.c);b.style.setProperty("--r",L.r);b.innerHTML="";
+ deck.forEach(function(v,i){
+  var c=document.createElement("button");c.className="card";c.dataset.i=i;c.setAttribute("aria-label","Card "+(i+1));
+  c.innerHTML='<span class="f back">?</span><span class="f face">'+v+'</span>';
+  c.addEventListener("click",function(){flip(i)});b.appendChild(c);
+ });
+ $("score").textContent=0;$("time").textContent="0:00";$("moves").textContent=0;$("combo").textContent="x1";$("hintN").textContent=3;
+ ui();showBest();save();
+}
+function startTimer(){if(g.started)return;g.started=true;timer=setInterval(function(){if(!g.paused){g.t++;$("time").textContent=fmt(g.t)}},1000)}
+function card(i){return $("board").children[i]}
+
+function flip(i){
+ if(g.lock||g.paused||g.over)return;var c=card(i);
+ if(c.classList.contains("up")||c.classList.contains("done"))return;
+ startTimer();c.classList.add("up");g.open.push(i);beep(520+g.open.length*80,.08);
+ if(g.open.length===2){
+  g.moves++;$("moves").textContent=g.moves;g.lock=true;
+  var a=g.open[0],b=g.open[1];
+  if(g.deck[a]===g.deck[b]){
+   setTimeout(function(){
+    card(a).classList.add("done");card(b).classList.add("done");
+    g.combo++;g.matched++;g.score+=100+(g.combo-1)*25;
+    $("score").textContent=g.score;bump("score");$("combo").textContent="x"+g.combo;bump("combo");
+    if(g.combo>1)toast("🔥 Combo x"+g.combo);
+    beep(784,.15,"triangle");setTimeout(function(){beep(1047,.2,"triangle")},110);
+    g.open=[];g.lock=false;if(g.matched===g.L.p)win();
+   },380);
+  }else{
+   card(a).classList.add("bad");card(b).classList.add("bad");
+   setTimeout(function(){
+    [a,b].forEach(function(x){card(x).classList.remove("up","bad")});
+    g.combo=0;g.score=Math.max(0,g.score-5);$("score").textContent=g.score;$("combo").textContent="x1";
+    beep(180,.18,"sawtooth");g.open=[];g.lock=false;
+   },850);
+  }
+ }
+}
+
+function win(){
+ g.over=true;clearInterval(timer);
+ var bonus=Math.max(0,g.L.par-g.t)*3;g.score+=bonus;$("score").textContent=g.score;
+ var perfect=g.L.p*2, st=g.moves<=perfect*1.3?3:g.moves<=perfect*1.9?2:1;
+ var prev=S.store[key()],isBest=!prev||g.score>prev.score;
+ if(isBest){S.store[key()]={score:g.score,time:g.t,moves:g.moves};save();showBest()}
+ $("stars").textContent="⭐".repeat(st)+"☆".repeat(3-st);
+ $("winT").textContent=st===3?"Perfect memory! 🎉":"Nicely done!";
+ $("wM").textContent=g.matched;$("wMv").textContent=g.moves;$("wT").textContent=fmt(g.t);$("wB").textContent="+"+bonus;$("wS").textContent=g.score;
+ $("newBest").innerHTML=isBest?'<span class="tag">New best score!</span>':"";
+ beep(659,.15,"triangle");setTimeout(function(){beep(880,.15,"triangle")},150);setTimeout(function(){beep(1175,.3,"triangle")},300);
+ confetti();setTimeout(function(){$("winM").classList.add("open")},700);
+}
+function confetti(){
+ var set=SETS[S.theme];if(window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ for(var i=0;i<28;i++){var e=document.createElement("div");e.className="conf";e.textContent=set[i%set.length];
+  e.style.left=Math.random()*100+"vw";e.style.animationDuration=(2+Math.random()*2)+"s";e.style.animationDelay=Math.random()*.6+"s";
+  document.body.appendChild(e);(function(x){setTimeout(function(){x.remove()},4800)})(e)}
+}
+function hint(){
+ if(g.over||g.paused||g.lock||g.hints<1)return;
+ startTimer();g.hints--;$("hintN").textContent=g.hints;g.score=Math.max(0,g.score-50);$("score").textContent=g.score;g.lock=true;
+ var hid=[];[].forEach.call($("board").children,function(c,i){if(!c.classList.contains("up")&&!c.classList.contains("done")){c.classList.add("up");hid.push(c)}});
+ setTimeout(function(){hid.forEach(function(c){c.classList.remove("up")});g.lock=false},1100+g.L.p*40);
+}
+function pause(on){
+ if(g.over||!g.started&&on)return;g.paused=on;$("pauseM").classList.toggle("open",on);
+ $("pauseB").textContent=on?"▶ Resume":"⏸ Pause";
+}
+
+$("themes").addEventListener("click",function(e){var t=e.target.dataset.t;if(t){S.theme=t;newGame()}});
+$("levels").addEventListener("click",function(e){var l=e.target.dataset.l;if(l!==undefined){S.level=+l;newGame()}});
+$("newB").onclick=function(){newGame()};
+$("againB").onclick=function(){$("winM").classList.remove("open");newGame()};
+$("closeW").onclick=function(){$("winM").classList.remove("open")};
+$("hintB").onclick=hint;
+$("pauseB").onclick=function(){pause(!g.paused)};
+$("resumeB").onclick=function(){pause(false)};
+$("soundB").onclick=function(){S.sound=!S.sound;ui();save();beep(660,.1)};
+$("verB").onclick=function(){$("verM").classList.add("open")};
+$("closeV").onclick=function(){$("verM").classList.remove("open")};
+document.addEventListener("visibilitychange",function(){if(document.hidden&&g.started&&!g.over)pause(true)});
+document.addEventListener("keydown",function(e){
+ if(e.key==="Escape"){["verM","winM"].forEach(function(m){$(m).classList.remove("open")})}
+ else if(e.key==="p"||e.key==="P")pause(!g.paused);
+ else if(e.key==="h"||e.key==="H")hint();
+ else if(e.key==="n"||e.key==="N")newGame();
+});
+newGame();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DataForge – CSV · JSON · Table Studio</title>
+<style>
+:root{--bg:#f3f1fb;--bg2:#e6e1fa;--card:rgba(255,255,255,.78);--bd:rgba(90,70,160,.16);--tx:#1d1a33;--mut:#6b6788;--ac:#6a55f5;--ac2:#ff7a59;--ok:#12a36b;--er:#d93f4f;--in:rgba(255,255,255,.9);--sh:0 10px 40px -12px rgba(70,50,160,.25);--r:18px;
+--f:ui-rounded,"SF Pro Rounded","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;--m:ui-monospace,"SF Mono",Consolas,"Cascadia Code",monospace}
+:root[data-theme=dark]{--bg:#120f24;--bg2:#1d1740;--card:rgba(32,26,66,.72);--bd:rgba(170,150,255,.16);--tx:#eeeaff;--mut:#9b95c4;--ac:#8d7bff;--in:rgba(14,11,32,.7);--sh:0 10px 40px -12px rgba(0,0,0,.6)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0)}
+body{margin:0;min-height:100vh;font:15px/1.5 var(--f);color:var(--tx);background:radial-gradient(900px 500px at 8% -10%,var(--bg2),transparent 60%),radial-gradient(700px 500px at 100% 0,color-mix(in srgb,var(--ac2) 18%,transparent),transparent 60%),var(--bg);background-attachment:fixed;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{display:flex;align-items:center;gap:12px;padding:14px clamp(12px,3vw,32px);flex-wrap:wrap}
+.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;box-shadow:0 6px 20px -4px var(--ac)}
+h1{font-size:clamp(19px,3vw,26px);margin:0;letter-spacing:-.02em;line-height:1.1}
+h1 small{display:block;font-size:12px;font-weight:500;color:var(--mut);letter-spacing:0;margin-top:3px}
+.sp{flex:1}
+.chip{border:1px solid var(--bd);background:var(--card);padding:7px 13px;border-radius:99px;cursor:pointer;backdrop-filter:blur(10px);transition:transform .15s,border-color .15s}
+.chip:hover{border-color:var(--ac);transform:translateY(-1px)}
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:16px;padding:0 clamp(12px,3vw,32px) 24px;max-width:1900px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);backdrop-filter:blur(14px);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h2{font-size:16px;margin:0;display:flex;align-items:center;gap:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--bd);background:var(--in);padding:7px 12px;border-radius:11px;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--ac);color:var(--ac)}
+.btn.p{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 60%,var(--ac2)));color:#fff;border-color:transparent;font-weight:600}
+.btn.p:hover{color:#fff;filter:brightness(1.1)}
+select,input[type=text],input:not([type]){border:1px solid var(--bd);background:var(--in);border-radius:10px;padding:6px 9px;min-width:0}
+label.ck{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--mut);cursor:pointer}
+label.ck input{accent-color:var(--ac)}
+textarea{width:100%;flex:1;min-height:300px;resize:vertical;border:1px solid var(--bd);background:var(--in);border-radius:13px;padding:12px;font:13px/1.5 var(--m);tab-size:2}
+#drop{border:2px dashed var(--bd);border-radius:13px;padding:10px;text-align:center;color:var(--mut);font-size:13px;transition:.15s}
+#drop.on,body.dg #drop{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 12%,transparent);color:var(--ac)}
+.tabs{display:inline-flex;background:var(--in);border:1px solid var(--bd);border-radius:12px;padding:3px}
+.tabs button{border:0;background:none;padding:6px 14px;border-radius:9px;cursor:pointer}
+.tabs button.on{background:var(--ac);color:#fff}
+.stats{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.stats b{color:var(--tx)}
+#msg{font-size:13px;min-height:20px}
+#msg.er{color:var(--er)}#msg.ok{color:var(--ok)}
+.tw{overflow:auto;max-height:62vh;border:1px solid var(--bd);border-radius:13px;background:var(--in)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 10px;border-bottom:1px solid var(--bd);border-right:1px solid var(--bd);text-align:left;white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+th{position:sticky;top:0;background:color-mix(in srgb,var(--bg2) 92%,var(--ac));z-index:1}
+th .n{outline:0;font-weight:700}
+th button{border:0;background:none;cursor:pointer;color:var(--mut);padding:0 3px}
+th button:hover{color:var(--ac2)}
+td:focus{outline:2px solid var(--ac);outline-offset:-2px;white-space:normal;background:color-mix(in srgb,var(--ac) 10%,transparent)}
+td.i{color:var(--mut);text-align:right;user-select:none;position:sticky;left:0;background:var(--in);font-size:11px}
+tr:hover td{background:color-mix(in srgb,var(--ac) 6%,transparent)}
+.empty{padding:40px 16px;text-align:center;color:var(--mut)}
+#out{min-height:360px}
+dialog{border:1px solid var(--bd);border-radius:20px;background:var(--bg);color:var(--tx);max-width:min(560px,92vw);padding:22px;box-shadow:var(--sh)}
+dialog::backdrop{background:rgba(10,6,30,.55);backdrop-filter:blur(4px)}
+dialog h3{margin:0 0 4px}
+.rel{border-left:3px solid var(--ac);padding:2px 0 2px 14px;margin:14px 0}
+.rel h4{margin:0}.rel span{color:var(--mut);font-size:12px}
+.rel ul{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:6px 12px 22px}
+footer b{color:var(--tx)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0));transform:translate(-50%,40px);opacity:0;background:var(--tx);color:var(--bg);padding:9px 16px;border-radius:99px;transition:.25s;pointer-events:none;z-index:9}
+#toast.on{transform:translate(-50%,0);opacity:1}
+.xf{flex-direction:column;align-items:stretch;gap:8px;border:1px dashed var(--bd);border-radius:13px;padding:10px}
+.xf .row b{min-width:104px;font-size:13px}
+.dh{cursor:grab;color:var(--mut);padding-right:4px;user-select:none}
+th.over{box-shadow:inset 4px 0 var(--ac2)}
+#left select{max-width:100%}
+[hidden]{display:none!important}
+.bar{width:70px;height:8px;border-radius:9px;background:var(--bd)}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.st{border:1px solid var(--bd);border-radius:99px;padding:2px 10px;font-size:12px;background:var(--in)}
+#stl{gap:6px}
+#chs svg{max-width:100%;height:auto;border-radius:14px;display:block}
+tr.sel td{background:color-mix(in srgb,var(--ac) 14%,transparent)}
+#vs tbody tr{cursor:pointer}
+.st button{border:0;background:none;cursor:pointer;color:var(--mut);padding:0 2px}
+.st button:hover{color:var(--ac2)}
+#sf label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut);margin:8px 0}
+#sf input:not([type=checkbox]),#sf select{width:100%;color:var(--tx)}
+@media(max-width:980px){main{grid-template-columns:1fr}textarea{min-height:200px}.tw{max-height:50vh}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{header,#left,.tools,footer{display:none}main{display:block}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-hidden="true">D</div>
+  <h1>DataForge<small>CSV · JSON · Table converter &amp; prettifier — 100% offline</small></h1>
+  <div class="sp"></div>
+  <button class="chip" id="vbtn" title="Version history">v1.4.0 · What’s new</button>
+  <button class="chip" id="theme" aria-label="Toggle theme">◐ Theme</button>
+</header>
+
+<main>
+<section class="card" id="left">
+  <h2>Input</h2>
+  <div class="row">
+    <label class="ck">Source
+      <select id="src"><option value="auto">Auto-detect</option><option>csv</option><option>tsv</option><option>json</option><option>ndjson</option><option>markdown</option><option>html</option></select></label>
+    <label class="ck">Delimiter
+      <select id="dl"><option value="auto">Auto</option><option value=",">Comma ,</option><option value=";">Semicolon ;</option><option value="&#9;">Tab</option><option value="|">Pipe |</option></select></label>
+    <label class="ck"><input type="checkbox" id="hdr" checked> First row is header</label>
+  </div>
+  <div id="drop">Drop .csv, .tsv, .json, .ndjson, .xlsx, .md or .html files here (several files are merged), or
+    <button class="btn" id="pick">Open file</button>
+    <button class="btn" id="paste">Paste clipboard</button>
+    <input type="file" id="file" multiple hidden accept=".csv,.tsv,.txt,.json,.ndjson,.jsonl,.md,.html,.htm,.xlsx,.xlsm">
+  </div>
+  <div class="row" id="shr" hidden><b style="font-size:13px">Excel sheet</b><select id="sh" aria-label="Excel sheet"></select></div>
+  <textarea id="in" spellcheck="false" placeholder="Paste CSV, TSV, JSON, NDJSON, a Markdown table or an HTML table here. Format is detected automatically."></textarea>
+  <div class="row">
+    <button class="btn p" id="conv">Convert</button>
+    <button class="btn" id="sample">Load sample</button>
+    <button class="btn" id="clr">Clear</button>
+  </div>
+  <div class="row xf">
+    <div class="row"><b>Merge files</b>
+      <select id="mm" aria-label="Merge mode"><option value="rows">Append rows (match columns by name)</option><option value="side">Side by side (join columns)</option></select>
+      <label class="ck"><input type="checkbox" id="ms" checked> Add source_file column</label>
+      <button class="btn" id="mf">Add files to table</button>
+      <input type="file" id="mfi" multiple hidden accept=".csv,.tsv,.txt,.json,.ndjson,.jsonl,.md,.html,.htm,.xlsx,.xlsm"></div>
+    <div class="row"><b>Presets</b>
+      <select id="ps" aria-label="Saved presets"></select>
+      <input id="pn" placeholder="Preset name" style="width:120px" aria-label="Preset name">
+      <button class="btn" id="pv">Save</button><button class="btn" id="pd">Delete</button>
+      <button class="btn" id="pe">Export</button><button class="btn" id="pi">Import</button>
+      <input type="file" id="pf" hidden accept=".json"></div>
+  </div>
+  <div id="msg" role="status"></div>
+</section>
+
+<section class="card">
+  <div class="row">
+    <div class="tabs" role="tablist"><button class="on" data-v="t">Table</button><button data-v="s">Stats</button><button data-v="o">Output</button></div>
+    <div class="stats" id="stats"></div>
+    <div class="sp"></div>
+    <input id="q" placeholder="Filter rows…" style="width:140px" aria-label="Filter rows">
+  </div>
+
+  <div class="row tools">
+    <button class="btn" data-t="trim">Trim</button>
+    <button class="btn" data-t="empty">Drop empty rows</button>
+    <button class="btn" data-t="dedupe">Remove duplicates</button>
+    <button class="btn" data-t="transpose">Transpose</button>
+    <button class="btn" data-t="heads">Clean headers</button>
+    <button class="btn" data-t="colsaz">Sort columns A–Z</button>
+    <button class="btn" data-t="addr">+ Row</button>
+    <button class="btn" data-t="addc">+ Column</button>
+    <button class="btn" data-t="undo">↶ Undo</button>
+  </div>
+  <div class="row tools xf" style="display:flex">
+    <div class="row"><b>Find &amp; replace</b>
+      <input id="fi" placeholder="Find" style="width:110px" aria-label="Find"><input id="ri" placeholder="Replace with" style="width:120px" aria-label="Replace with">
+      <select id="fc" aria-label="Column to search"></select>
+      <label class="ck"><input type="checkbox" id="rx"> Regex</label><label class="ck"><input type="checkbox" id="mc"> Match case</label>
+      <button class="btn" id="fr">Replace all</button></div>
+    <div class="row"><b>Convert column</b>
+      <select id="tc" aria-label="Column"></select>
+      <select id="tt" aria-label="Convert to"><option value="number">Number</option><option value="int">Integer</option><option value="bool">Boolean</option><option value="date">Date (YYYY-MM-DD)</option><option value="text">Text</option><option value="upper">UPPERCASE</option><option value="lower">lowercase</option><option value="title">Title Case</option><option value="trim">Trim spaces</option></select>
+      <button class="btn" id="tb">Convert</button></div>
+    <div class="row"><b>JSON path</b>
+      <input id="jp" placeholder="$.data.users[*].name" style="flex:1;min-width:150px" aria-label="JSON path">
+      <button class="btn" id="jx">Extract</button><button class="btn" id="jr">Reset to input</button></div>
+  </div>
+  <div class="row tools xf" style="display:flex">
+    <div class="row"><b>Transform steps</b><div class="row" id="stl"></div></div>
+    <div class="stats">Edit ✎, reorder ‹ › or remove ✕ any step. The table is rebuilt from the data you loaded.</div>
+    <div class="row">
+      <input id="rn" placeholder="Recipe name" style="width:130px" aria-label="Recipe name"><button class="btn" id="rv">Save steps</button>
+      <select id="rs" aria-label="Saved recipes"></select><button class="btn p" id="ra">Apply recipe</button><button class="btn" id="rd">Delete</button>
+      <button class="btn" id="rc">Clear steps</button><button class="btn" id="re">Export</button><button class="btn" id="rim">Import</button>
+      <input type="file" id="rf" hidden accept=".json"></div>
+  </div>
+
+  <div id="vt"><div class="tw" id="tw"></div><div class="stats" style="margin-top:6px">Click a cell to edit · ⠿ drag or ‹ › move a column · ⇅ sorts · ✕ removes a column</div></div>
+
+  <div id="vs" hidden></div>
+
+  <div id="vo" hidden style="display:flex;flex-direction:column;gap:10px">
+    <div class="row">
+      <label class="ck">Format
+        <select id="fmt">
+          <option value="json">JSON (array of objects)</option>
+          <option value="raw">JSON (original structure)</option>
+          <option value="jarr">JSON (array of arrays)</option>
+          <option value="nd">NDJSON</option>
+          <option value="csv">CSV</option><option value="tsv">TSV</option>
+          <option value="md">Markdown table</option><option value="html">HTML table</option>
+          <option value="sql">SQL INSERT</option><option value="xml">XML</option><option value="yaml">YAML</option>
+        </select></label>
+      <label class="ck">Indent
+        <select id="ind"><option value="2">2 spaces</option><option value="4">4 spaces</option><option value="t">Tab</option><option value="0">Minified</option></select></label>
+      <label class="ck">Delimiter
+        <select id="od"><option value=",">,</option><option value=";">;</option><option value="|">|</option></select></label>
+    </div>
+    <div class="row">
+      <label class="ck"><input type="checkbox" id="inf" checked> Detect numbers &amp; booleans</label>
+      <label class="ck"><input type="checkbox" id="oh" checked> Include header</label>
+      <label class="ck"><input type="checkbox" id="qa"> Quote all (CSV)</label>
+      <label class="ck"><input type="checkbox" id="sk"> Sort keys</label>
+      <label class="ck">SQL table <input id="tn" value="my_table" style="width:100px"></label>
+    </div>
+    <textarea id="out" spellcheck="false" readonly aria-label="Output"></textarea>
+    <div class="row">
+      <button class="btn p" id="cp">Copy</button>
+      <button class="btn" id="dl2">Download</button>
+      <button class="btn" id="xls">Excel (.xlsx)</button>
+      <button class="btn" id="pr">Print table</button>
+      <button class="btn" id="use">Use output as input</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>Developed by <b>Habib AlMawali</b> · DataForge v1.4.0 · Runs fully in your browser — nothing leaves your device.</footer>
+<div id="toast"></div>
+
+<dialog id="sd"><h3>Edit step</h3><div id="sf"></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="sdc">Cancel</button><button class="btn p" id="sds">Save step</button></div></dialog>
+
+<dialog id="log">
+  <h3>Version history</h3>
+  <div class="stats">Developed by Habib AlMawali</div>
+  <div class="rel"><h4>v1.4.0 <span>22 Nov 2026 · Export and edit update</span></h4>
+    <ul>
+      <li>Excel (.xlsx) export with a styled, frozen header row, auto-filter, column widths, real numbers, booleans and dates; it replaces the old .xls export</li>
+      <li>Charts from column statistics: click a column in the Stats tab for a histogram or top-values bar chart, or chart a sum or average by category; save as SVG or PNG</li>
+      <li>Editable recorded steps: edit ✎, reorder ‹ ›, or remove ✕ any step and the table is rebuilt from the loaded data. Cell edits, header renames, added rows and columns are now recorded too</li>
+    </ul></div>
+  <div class="rel"><h4>v1.3.0 <span>22 Nov 2026 · Insight update</span></h4>
+    <ul>
+      <li>Excel import: open .xlsx and .xlsm files (also in multi-file merge), pick a sheet, dates are converted to YYYY-MM-DD</li>
+      <li>Saved transform steps: every clean-up you apply is recorded, then saved as a named recipe and replayed on new data; recipes can be exported and imported</li>
+      <li>Column statistics tab: type, filled and empty counts, unique values, min, max, mean, median, sum, standard deviation and most common values</li>
+    </ul></div>
+  <div class="rel"><h4>v1.2.0 <span>22 Nov 2026 · Organise update</span></h4>
+    <ul>
+      <li>Column reordering: drag the ⠿ handle, use the ‹ › buttons (works on touch screens), or sort columns A–Z</li>
+      <li>Multi-file merge: drop or select several files, or add files to the current table; append rows by column name or join side by side, with an optional source_file column</li>
+      <li>Saved presets for import and export settings, stored in your browser, with export and import to share them between machines</li>
+    </ul></div>
+  <div class="rel"><h4>v1.1.0 <span>22 Nov 2026 · Transform update</span></h4>
+    <ul>
+      <li>Find &amp; replace across all columns or one column, with regex and match-case options</li>
+      <li>Column type conversion: number, integer, boolean, date (YYYY-MM-DD), text, upper/lower/title case, trim</li>
+      <li>JSON path extraction such as <code>$.data.users[*].name</code> or <code>items[0].tags</code>, with a reset to the original input</li>
+      <li>Conversion and replace report how many cells changed or could not be converted</li>
+    </ul></div>
+  <div class="rel"><h4>v1.0.0 <span>22 Nov 2026 · Initial release</span></h4>
+    <ul>
+      <li>Import CSV, TSV, JSON, NDJSON, Markdown and HTML tables by paste, file or drag &amp; drop</li>
+      <li>Export JSON, NDJSON, CSV, TSV, Markdown, HTML, SQL, XML, YAML and Excel (.xls)</li>
+      <li>JSON prettify, minify and key sorting; nested objects are flattened into dotted columns</li>
+      <li>Editable table with sort, filter, add/remove rows and columns, undo</li>
+      <li>Tools: trim, drop empty rows, remove duplicates, transpose, clean headers</li>
+      <li>Auto-detects format and delimiter; light and dark themes; fully offline, no external requests</li>
+    </ul></div>
+  <div class="rel"><h4>Next <span>Planned</span></h4>
+    <ul><li>Multi-sheet .xlsx export, line and pie charts, sharing recipe bundles</li></ul></div>
+  <div class="row" style="justify-content:flex-end"><button class="btn p" id="lc">Close</button></div>
+</dialog>
+
+<script>
+(()=>{
+const VER="1.4.0",$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let D={cols:[],rows:[]},hist=[],rawJSON=null,sort={c:-1,d:1},timer,XL=null,STEPS=[],sl=[],BASE=null,EP=0;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._);t._=setTimeout(()=>t.classList.remove("on"),1800)};
+const msg=(m,k)=>{const e=$("#msg");e.textContent=m;e.className=k||""};
+const snap=()=>{hist.push(JSON.stringify(D));sl.push({s:STEPS.slice(),e:EP});if(hist.length>60){hist.shift();sl.shift()}};
+
+/* ---------- parsing ---------- */
+function parseDelim(t,d){const r=[];let row=[],f="",q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c=='"'&&f==="")q=true;
+  else if(c==d){row.push(f);f=""}
+  else if(c=="\n"||c=="\r"){if(c=="\r"&&t[i+1]=="\n")i++;row.push(f);r.push(row);row=[];f=""}
+  else f+=c}
+ if(f!==""||row.length){row.push(f);r.push(row)}
+ return r.filter(x=>!(x.length==1&&x[0]===""))}
+function detectDelim(t){const l=t.split(/\r?\n/).find(x=>x.trim())||"";let b=",",n=0;
+ for(const d of [",",";","\t","|"]){const c=l.split(d).length-1;if(c>n){n=c;b=d}}return b}
+function fromRows(r,h){if(!r.length)return{cols:[],rows:[]};
+ const w=Math.max(...r.map(x=>x.length));let cols;
+ if(h){cols=r[0].map((c,i)=>String(c).trim()||"col"+(i+1));r=r.slice(1)}
+ else cols=[];
+ while(cols.length<w)cols.push("col"+(cols.length+1));
+ const seen={};cols=cols.map(c=>{seen[c]=(seen[c]||0)+1;return seen[c]>1?c+"_"+seen[c]:c});
+ return{cols,rows:r.map(x=>cols.map((_,i)=>x[i]??""))}}
+function fl(o,p,out){if(o&&typeof o=="object"&&!Array.isArray(o)){const k=Object.keys(o);
+ if(!k.length&&p)out[p]="";k.forEach(x=>fl(o[x],p?p+"."+x:x,out))}
+ else out[p||"value"]=Array.isArray(o)?JSON.stringify(o):o===null?"":o}
+function fromJSON(v){
+ if(!Array.isArray(v)){if(v&&typeof v=="object"){const a=Object.values(v).find(x=>Array.isArray(x)&&x.length&&typeof x[0]=="object");v=a||[v]}else v=[v]}
+ if(v.length&&v.every(Array.isArray))return fromRows(v.map(r=>r.map(x=>x===null?"":typeof x=="object"?JSON.stringify(x):x)),$("#hdr").checked);
+ const cols=[],S=new Set(),flat=v.map(o=>{const out={};fl(o,"",out);return out});
+ flat.forEach(o=>Object.keys(o).forEach(k=>{if(!S.has(k)){S.add(k);cols.push(k)}}));
+ return{cols,rows:flat.map(o=>cols.map(k=>o[k]??""))}}
+function fromMD(t){const r=t.split(/\r?\n/).filter(l=>l.trim().startsWith("|")&&!/^\s*\|?\s*:?-{2,}/.test(l.replace(/\|/g,"|").trim().replace(/^\|\s*/,"")));
+ return fromRows(r.map(l=>l.trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim())),true)}
+function fromHTML(t){const d=new DOMParser().parseFromString(t,"text/html"),tb=d.querySelector("table");
+ if(!tb)throw Error("No <table> found in HTML");
+ return fromRows([...tb.querySelectorAll("tr")].map(tr=>[...tr.children].map(c=>c.textContent.trim())),true)}
+function detect(t){const s=t.trim();
+ if(/^[\[{]/.test(s)){try{JSON.parse(s);return"json"}catch(e){if(s.split(/\r?\n/).every(l=>!l.trim()||/^[\[{].*[\]}]$/.test(l.trim())))return"ndjson";return"json"}}
+ if(/<table/i.test(s))return"html";
+ if(s.startsWith("|"))return"markdown";
+ return detectDelim(s)=="\t"?"tsv":"csv"}
+function parse(){
+ const t=$("#in").value;rawJSON=null;XL=null;$("#shr").hidden=true;
+ if(!t.trim()){snap();D={cols:[],rows:[]};STEPS.length=0;render();msg("");return}
+ try{let f=$("#src").value;if(f=="auto")f=detect(t);let d;
+  if(f=="json"){rawJSON=JSON.parse(t);d=fromJSON(rawJSON)}
+  else if(f=="ndjson"){rawJSON=t.split(/\r?\n/).filter(l=>l.trim()).map(l=>JSON.parse(l));d=fromJSON(rawJSON)}
+  else if(f=="markdown")d=fromMD(t);
+  else if(f=="html")d=fromHTML(t);
+  else{let dl=$("#dl").value;if(f=="tsv")dl="\t";else if(dl=="auto")dl=detectDelim(t);
+   d=fromRows(parseDelim(t,dl),$("#hdr").checked)}
+  snap();D=d;STEPS.length=0;setBase();sort.c=-1;render();
+  msg(`Parsed as ${f.toUpperCase()} · ${D.rows.length} rows × ${D.cols.length} columns`,"ok")}
+ catch(e){msg("Could not parse: "+e.message+". Check the source format or try a different one.","er")}}
+
+/* ---------- output ---------- */
+const infer=v=>{if(typeof v!="string")return v;const s=v.trim();
+ if(s==="")return null;if(/^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/.test(s))return Number(s);
+ if(s=="true")return true;if(s=="false")return false;return v};
+const sortKeys=o=>Array.isArray(o)?o.map(sortKeys):o&&typeof o=="object"?Object.keys(o).sort().reduce((a,k)=>(a[k]=sortKeys(o[k]),a),{}):o;
+const ind=()=>{const v=$("#ind").value;return v=="t"?"\t":v=="0"?0:+v};
+const cell=v=>$("#inf").checked?infer(v):v;
+const objs=()=>D.rows.map(r=>Object.fromEntries(D.cols.map((c,i)=>[c,cell(r[i])])));
+const csvEsc=(v,d,a)=>{v=v==null?"":String(v);return a||v.includes(d)||/["\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+const tag=s=>s.replace(/[^\w.-]/g,"_").replace(/^(\d|-|\.)/,"_$1");
+const yv=v=>{v=cell(v);return v===null?"null":typeof v=="string"?JSON.stringify(v):String(v)};
+const sqlv=v=>{v=cell(v);return v===null?"NULL":typeof v=="string"?"'"+v.replace(/'/g,"''")+"'":String(v)};
+function gen(){const f=$("#fmt").value,i=ind(),J=o=>JSON.stringify($("#sk").checked?sortKeys(o):o,null,i),h=$("#oh").checked;
+ if(!D.cols.length)return"";
+ switch(f){
+  case"json":return J(objs());
+  case"raw":return J(rawJSON!==null?rawJSON:objs());
+  case"jarr":return J((h?[D.cols]:[]).concat(D.rows.map(r=>r.map(cell))));
+  case"nd":return objs().map(o=>JSON.stringify($("#sk").checked?sortKeys(o):o)).join("\n");
+  case"csv":case"tsv":{const d=f=="tsv"?"\t":$("#od").value,a=$("#qa").checked;
+   return(h?[D.cols]:[]).concat(D.rows).map(r=>r.map(v=>csvEsc(v,d,a)).join(d)).join("\n")}
+  case"md":{const e=v=>String(v??"").replace(/\|/g,"\\|").replace(/\n/g," "),w=D.cols.length;
+   return["| "+D.cols.map(e).join(" | ")+" |","| "+Array(w).fill("---").join(" | ")+" |",...D.rows.map(r=>"| "+r.map(e).join(" | ")+" |")].join("\n")}
+  case"html":return"<table>\n  <thead>\n    <tr>"+D.cols.map(c=>"<th>"+esc(c)+"</th>").join("")+"</tr>\n  </thead>\n  <tbody>\n"+D.rows.map(r=>"    <tr>"+r.map(v=>"<td>"+esc(v??"")+"</td>").join("")+"</tr>").join("\n")+"\n  </tbody>\n</table>";
+  case"sql":{const t=$("#tn").value||"my_table",c=D.cols.map(x=>'"'+x.replace(/"/g,'""')+'"').join(", ");
+   return D.rows.map(r=>`INSERT INTO ${t} (${c}) VALUES (${r.map(sqlv).join(", ")});`).join("\n")}
+  case"xml":{const p=i?(i==="\t"?"\t":" ".repeat(i)):"",n=i?"\n":"";
+   return'<?xml version="1.0" encoding="UTF-8"?>'+n+"<rows>"+n+D.rows.map(r=>p+"<row>"+n+D.cols.map((c,k)=>p+p+`<${tag(c)}>${esc(r[k]??"")}</${tag(c)}>`).join(n)+n+p+"</row>").join(n)+n+"</rows>"}
+  case"yaml":return D.rows.map(r=>D.cols.map((c,k)=>(k?"  ":"- ")+JSON.stringify(c)+": "+yv(r[k])).join("\n")).join("\n")}}
+const EXT={json:["json","application/json"],raw:["json","application/json"],jarr:["json","application/json"],nd:["ndjson","application/x-ndjson"],csv:["csv","text/csv"],tsv:["tsv","text/tab-separated-values"],md:["md","text/markdown"],html:["html","text/html"],sql:["sql","text/plain"],xml:["xml","application/xml"],yaml:["yaml","text/yaml"]};
+const save=(txt,name,mime)=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:mime+";charset=utf-8"}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
+
+/* ---------- render ---------- */
+function render(){
+ const q=$("#q").value.toLowerCase(),tw=$("#tw");
+ if(!D.cols.length){tw.innerHTML='<div class="empty">Nothing here yet.<br>Paste data, drop a file or load the sample to start.</div>'}
+ else{let idx=D.rows.map((_,i)=>i);if(q)idx=idx.filter(i=>D.rows[i].some(v=>String(v).toLowerCase().includes(q)));
+  const lim=idx.slice(0,1000);
+  tw.innerHTML="<table><thead><tr><th></th>"+D.cols.map((c,i)=>`<th data-c="${i}"><span class="dh" draggable="true" data-dh="${i}" title="Drag to reorder">⠿</span><span class="n" contenteditable spellcheck="false">${esc(c)}</span><button data-s="${i}" title="Sort">${sort.c==i?(sort.d>0?"▲":"▼"):"⇅"}</button><button data-m="${i}" data-dir="-1" title="Move left">‹</button><button data-m="${i}" data-dir="1" title="Move right">›</button><button data-x="${i}" title="Remove column">✕</button></th>`).join("")+"</tr></thead><tbody>"+
+   lim.map(i=>`<tr data-r="${i}"><td class="i">${i+1}</td>`+D.rows[i].map((v,c)=>`<td contenteditable spellcheck="false" data-c="${c}">${esc(v)}</td>`).join("")+"</tr>").join("")+"</tbody></table>"+
+   (idx.length>lim.length?`<div class="empty">Showing first 1,000 of ${idx.length} rows. Export to get them all.</div>`:"")}
+ colSel();stats();$("#out").value=gen();if(!$("#vs").hidden)stat();steps()}
+function stats(){const o=$("#out").value||"";const cells=D.rows.length*D.cols.length;
+ $("#stats").innerHTML=`<span><b>${D.rows.length}</b> rows</span><span><b>${D.cols.length}</b> cols</span><span><b>${cells}</b> cells</span>`}
+function refreshOut(){$("#out").value=gen()}
+
+/* ---------- events ---------- */
+const tw=$("#tw");
+tw.addEventListener("focusin",e=>{const t=e.target;if(t.isContentEditable&&!t._s){t._s=1;snap();
+ t._o=t.tagName=="TD"?D.rows[+t.parentNode.dataset.r][+t.dataset.c]:D.cols[+t.parentNode.dataset.c]}});
+tw.addEventListener("focusout",e=>{const t=e.target;if(!t._s)return;t._s=0;
+ if(t.tagName=="TD"){const r=+t.parentNode.dataset.r,c=+t.dataset.c;if(String(D.rows[r][c])!==String(t._o))rec({t:"ce",r,c:D.cols[c],v:D.rows[r][c]})}
+ else if(t.classList.contains("n")){const c=+t.parentNode.dataset.c;if(D.cols[c]!==t._o)rec({t:"rn",c:t._o,to:D.cols[c]})}
+ steps()});
+tw.addEventListener("input",e=>{const t=e.target;
+ if(t.tagName=="TD"){D.rows[+t.parentNode.dataset.r][+t.dataset.c]=t.textContent}
+ else if(t.classList.contains("n")){D.cols[+t.parentNode.dataset.c]=t.textContent}
+ refreshOut()});
+tw.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.isContentEditable){e.preventDefault();e.target.blur()}});
+tw.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.m!==undefined){const c=+b.dataset.m,n=c+ +b.dataset.dir;if(n>=0&&n<D.cols.length)moveCol(c,n);return}
+ if(b.dataset.x!==undefined){snap();const c=+b.dataset.x;rec({t:"rm",c:D.cols[c]});D.cols.splice(c,1);D.rows.forEach(r=>r.splice(c,1));render()}
+ if(b.dataset.s!==undefined){const c=+b.dataset.s;snap();sort.d=sort.c==c?-sort.d:1;sort.c=c;doSort(c,sort.d);rec({t:"so",c:D.cols[c],d:sort.d});render()}});
+
+const tools={
+ trim(){D.rows=D.rows.map(r=>r.map(v=>typeof v=="string"?v.trim():v));D.cols=D.cols.map(c=>c.trim())},
+ empty(){const n=D.rows.length;D.rows=D.rows.filter(r=>r.some(v=>String(v).trim()!==""));toast(`Removed ${n-D.rows.length} empty rows`)},
+ dedupe(){const s=new Set(),n=D.rows.length;D.rows=D.rows.filter(r=>{const k=JSON.stringify(r);if(s.has(k))return false;s.add(k);return true});toast(`Removed ${n-D.rows.length} duplicates`)},
+ transpose(){const all=[D.cols,...D.rows];const w=all.length,h=D.cols.length;const t=Array.from({length:h},(_,c)=>all.map(r=>r[c]??""));
+  D=fromRows(t,true)},
+ heads(){D.cols=D.cols.map(c=>c.trim().toLowerCase().replace(/[^a-z0-9.]+/g,"_").replace(/^_+|_+$/g,"")||"col")},
+ addr(){D.rows.push(D.cols.map(()=>""))},
+ colsaz(){const o=D.cols.map((_,i)=>i).sort((a,b)=>D.cols[a].localeCompare(D.cols[b],undefined,{numeric:true}));D.cols=o.map(i=>D.cols[i]);D.rows=D.rows.map(r=>o.map(i=>r[i]));sort.c=-1},
+ addc(){D.cols.push("col"+(D.cols.length+1));D.rows.forEach(r=>r.push(""))}};
+$$("[data-t]").forEach(b=>b.onclick=()=>{const t=b.dataset.t;
+ if(t=="undo"){if(hist.length){popUndo();render()}else toast("Nothing to undo");return}
+ if(!D.cols.length)return toast("Load data first");snap();tools[t]();rec({t});rawJSON=null;render()});
+
+$("#in").addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(parse,300)});
+["src","dl","hdr"].forEach(i=>$("#"+i).onchange=parse);
+$("#conv").onclick=parse;
+$("#clr").onclick=()=>{$("#in").value="";parse()};
+$("#q").oninput=render;
+["fmt","ind","od","inf","oh","qa","sk","tn"].forEach(i=>$("#"+i).addEventListener("input",refreshOut));
+function tab(v){$$(".tabs button").forEach(x=>x.classList.toggle("on",x.dataset.v==v));
+ $("#vt").hidden=v!="t";$("#vs").hidden=v!="s";$("#vo").hidden=v!="o";$("#vo").style.display=v=="o"?"flex":"none";
+ $$(".tools").forEach(x=>x.style.display=v=="t"?"":"none");if(v=="s")stat()}
+$$(".tabs button").forEach(b=>b.onclick=()=>tab(b.dataset.v));
+$("#vo").style.display="none";
+
+$("#cp").onclick=async()=>{const v=$("#out").value;try{await navigator.clipboard.writeText(v)}catch(e){$("#out").select();document.execCommand("copy")}toast("Copied to clipboard")};
+$("#dl2").onclick=()=>{const[e,m]=EXT[$("#fmt").value];save($("#out").value,"dataforge-export."+e,m);toast("Downloaded")};
+$("#xls").onclick=()=>{if(!D.cols.length)return toast("Load data first");saveBlob(xlsxBlob(),"dataforge-export.xlsx");toast("Excel file downloaded")};
+$("#pr").onclick=()=>{$("#tw").style.maxHeight="none";window.print()};
+$("#use").onclick=()=>{$("#in").value=$("#out").value;toast("Output moved to input")};
+
+const load=f=>{const xe=f.name.split(".").pop().toLowerCase();if(xe=="xlsx"||xe=="xlsm")return loadXlsx(f);const r=new FileReader();r.onload=()=>{$("#in").value=r.result;
+ const x=f.name.split(".").pop().toLowerCase();$("#src").value={csv:"csv",tsv:"tsv",json:"json",ndjson:"ndjson",jsonl:"ndjson",md:"markdown",html:"html",htm:"html"}[x]||"auto";parse();toast("Loaded "+f.name)};r.readAsText(f)};
+$("#pick").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{const fs=[...e.target.files];if(fs.length>1)mergeFiles(fs,null);else if(fs[0])load(fs[0]);e.target.value=""};
+$("#paste").onclick=async()=>{try{$("#in").value=await navigator.clipboard.readText();$("#src").value="auto";parse()}catch(e){msg("Clipboard access was blocked. Paste into the box with Ctrl/Cmd+V.","er")}};
+addEventListener("dragover",e=>{e.preventDefault();if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files"))document.body.classList.add("dg")});
+addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("dg")});
+addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("dg");const fs=[...e.dataTransfer.files];if(fs.length>1)mergeFiles(fs,null);else if(fs[0])load(fs[0])});
+addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key=="z"&&!e.target.isContentEditable&&e.target.tagName!="TEXTAREA"){e.preventDefault();$('[data-t=undo]').click()}});
+
+$("#sample").onclick=()=>{$("#src").value="auto";$("#in").value=`id,name,department,salary,active,joined
+1,"Amal Al Said",Engineering,4200,true,2021-03-14
+2,"Khalid Al Harthi",Finance,3800,true,2019-11-02
+3,"Fatma Al Balushi","Design, UX",3500,false,2022-07-21
+4,"Salim Al Rawahi",Operations,3100,true,2020-01-09
+4,"Salim Al Rawahi",Operations,3100,true,2020-01-09`;parse()};
+
+/* find & replace, type conversion, JSON path */
+function colSel(){["fc","tc"].forEach(id=>{const s=$("#"+id),v=s.value;
+ s.innerHTML=(id=="fc"?'<option value="*">All columns</option>':"")+D.cols.map((c,i)=>`<option value="${i}">${esc(c)}</option>`).join("");
+ if([...s.options].some(o=>o.value==v))s.value=v})}
+function runFR(f,rp,c,rx,mc){let re;try{re=new RegExp(rx?f:f.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"g"+(mc?"":"i"))}catch(e){throw Error("Invalid regular expression")}
+ const ci=c=="*"?-1:D.cols.indexOf(c);if(c!="*"&&ci<0)throw Error(`column “${c}” not found`);let n=0;
+ D.rows=D.rows.map(r=>r.map((v,i)=>{if(ci>=0&&i!=ci)return v;const t=String(v),m=t.match(re);if(!m)return v;n+=m.length;return rx?t.replace(re,rp):t.replace(re,()=>rp)}));return n}
+const undoLast=()=>popUndo();
+$("#fr").onclick=()=>{const f=$("#fi").value;if(!f||!D.cols.length)return toast("Enter text to find");
+ const c=$("#fc").value=="*"?"*":D.cols[+$("#fc").value],rp=$("#ri").value,rx=$("#rx").checked,mc=$("#mc").checked;let n;
+ snap();try{n=runFR(f,rp,c,rx,mc)}catch(e){hist.pop();sl.pop();return toast(e.message)}
+ if(!n){hist.pop();sl.pop();return toast("No matches found")}
+ rec({t:"fr",f,rp,c,rx,mc});rawJSON=null;render();toast(`Replaced ${n} match${n>1?"es":""}`)};
+const pad=n=>String(n).padStart(2,"0");
+const CV={text:v=>String(v),trim:v=>String(v).trim(),upper:v=>String(v).toUpperCase(),lower:v=>String(v).toLowerCase(),
+ title:v=>String(v).toLowerCase().replace(/(^|[\s\-_])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()),
+ number:v=>{if(typeof v=="number")return v;const n=parseFloat(String(v).replace(/[^\d.eE+-]/g,""));return isNaN(n)?null:n},
+ int:v=>{const n=CV.number(v);return n===null?null:Math.round(n)},
+ bool:v=>{const s=String(v).trim().toLowerCase();return["true","yes","y","1","on"].includes(s)?"true":["false","no","n","0","off"].includes(s)?"false":null},
+ date:v=>{const s=String(v).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const d=new Date(s);return isNaN(d)?null:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}};
+function runCV(c,to){const f=CV[to];let ok=0,bad=0;D.rows.forEach(r=>{if(r[c]==="")return;const x=f(r[c]);if(x===null)bad++;else{if(x!==r[c])ok++;r[c]=x}});return[ok,bad]}
+$("#tb").onclick=()=>{if(!D.cols.length)return toast("Load data first");const c=+$("#tc").value,to=$("#tt").value;snap();
+ const[ok,bad]=runCV(c,to);rec({t:"cv",c:D.cols[c],to});rawJSON=null;render();toast(bad?`Converted ${ok} cells, ${bad} could not be converted`:`Converted ${ok} cells`)};
+function jpath(root,p){p=p.trim().replace(/^\$\.?/,"");let cur=[root];const T=p.match(/\[[^\]]*\]|[^.\[\]]+/g)||[];
+ for(const t of T){const nx=[];for(const o of cur){
+  if(t=="*"||t=="[*]"){if(Array.isArray(o))nx.push(...o);else if(o&&typeof o=="object")nx.push(...Object.values(o))}
+  else if(/^\[-?\d+\]$/.test(t)){if(Array.isArray(o)){let i=+t.slice(1,-1);if(i<0)i+=o.length;if(i in o)nx.push(o[i])}}
+  else{const k=t.replace(/^\[['"]?|['"]?\]$/g,"");if(o&&typeof o=="object"&&k in o)nx.push(o[k])}}
+  cur=nx}
+ return T.some(t=>t=="*"||t=="[*]")||cur.length!=1?cur:cur[0]}
+function runJP(p){const res=jpath(rawJSON!==null?rawJSON:objs(),p);if(res===undefined||(Array.isArray(res)&&!res.length))throw Error("path matched nothing");D=fromJSON(res);rawJSON=res;sort.c=-1}
+$("#jx").onclick=()=>{const p=$("#jp").value;if(!p.trim())return toast("Enter a JSON path");if(!D.cols.length)return toast("Load data first");
+ snap();try{runJP(p)}catch(e){hist.pop();sl.pop();return toast(e.message)}
+ rec({t:"jp",p});render();toast(`Extracted ${D.rows.length} rows`)};
+$("#jr").onclick=()=>XL?useSheet($("#sh").value):($("#in").value.trim()?parse():toast("Input is empty"));
+$("#jp").addEventListener("keydown",e=>{if(e.key=="Enter")$("#jx").click()});
+
+/* column reordering */
+function doMove(a,b){const[c]=D.cols.splice(a,1);D.cols.splice(b,0,c);D.rows.forEach(r=>{const[v]=r.splice(a,1);r.splice(b,0,v)})}
+function moveCol(a,b){snap();rec({t:"mv",c:D.cols[a],to:b});doMove(a,b);sort.c=-1;render()}
+let dragC=-1;
+tw.addEventListener("dragstart",e=>{const h=e.target.closest&&e.target.closest("[data-dh]");if(!h)return;dragC=+h.dataset.dh;e.dataTransfer.setData("text/plain","col");e.dataTransfer.effectAllowed="move"});
+tw.addEventListener("dragover",e=>{const t=e.target.closest("th[data-c]");if(dragC<0||!t)return;e.preventDefault();$$("th.over").forEach(x=>x.classList.remove("over"));t.classList.add("over")});
+tw.addEventListener("drop",e=>{const t=e.target.closest("th[data-c]");if(dragC<0||!t)return;e.preventDefault();e.stopPropagation();const f=dragC,to=+t.dataset.c;dragC=-1;if(f!=to)moveCol(f,to);else render()});
+tw.addEventListener("dragend",()=>{dragC=-1;$$("th.over").forEach(x=>x.classList.remove("over"))});
+
+/* multi-file merge */
+const EXTMAP={csv:"csv",tsv:"tsv",json:"json",ndjson:"ndjson",jsonl:"ndjson",md:"markdown",html:"html",htm:"html"};
+function build(t,f){if(f=="auto")f=detect(t);
+ if(f=="json"){rawJSON=JSON.parse(t);return fromJSON(rawJSON)}
+ if(f=="ndjson"){rawJSON=t.split(/\r?\n/).filter(l=>l.trim()).map(l=>JSON.parse(l));return fromJSON(rawJSON)}
+ if(f=="markdown")return fromMD(t);if(f=="html")return fromHTML(t);
+ let dl=$("#dl").value;if(f=="tsv")dl="\t";else if(dl=="auto")dl=detectDelim(t);
+ return fromRows(parseDelim(t,dl),$("#hdr").checked)}
+const readFile=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(Error("read failed"));r.readAsText(f)});
+async function mergeFiles(files,base){
+ const mode=$("#mm").value,src=$("#ms").checked,parts=[],errs=[];
+ msg("Reading "+files.length+" files…");
+ for(const f of files){try{parts.push({d:await fileToData(f),name:f.name})}catch(e){errs.push(f.name)}}
+ rawJSON=null;
+ if(base&&base.cols.length)parts.unshift({d:base,name:"(current table)"});
+ if(!parts.length)return msg("None of the files could be read. Check that they are CSV, TSV, JSON, NDJSON, Markdown or HTML tables.","er");
+ snap();const cols=[],rows=[];
+ if(mode=="rows"){
+  parts.forEach(p=>p.d.cols.forEach(c=>{if(!cols.includes(c))cols.push(c)}));
+  const sc=src?(cols.includes("source_file")?"source_file_2":"source_file"):null;
+  parts.forEach(p=>{const ix=cols.map(c=>p.d.cols.indexOf(c));p.d.rows.forEach(r=>{const row=ix.map(i=>i<0?"":r[i]);if(sc)row.push(p.name);rows.push(row)})});
+  if(sc)cols.push(sc)}
+ else{const h=Math.max(...parts.map(p=>p.d.rows.length)),seen={};
+  parts.forEach(p=>p.d.cols.forEach(c=>{seen[c]=(seen[c]||0)+1;cols.push(seen[c]>1?c+"_"+seen[c]:c)}));
+  for(let i=0;i<h;i++)rows.push(parts.flatMap(p=>p.d.cols.map((_,k)=>p.d.rows[i]?p.d.rows[i][k]:"")))}
+ D={cols,rows};STEPS.length=0;rawJSON=null;setBase();sort.c=-1;render();
+ msg(`Merged ${parts.length} sources → ${rows.length} rows × ${cols.length} columns`+(errs.length?" · skipped: "+errs.join(", "):""),errs.length?"er":"ok")}
+$("#mf").onclick=()=>$("#mfi").click();
+$("#mfi").onchange=e=>{const fs=[...e.target.files];if(fs.length)mergeFiles(fs,D);e.target.value=""};
+
+/* presets */
+const PIDS=["src","dl","hdr","fmt","ind","od","inf","oh","qa","sk","tn","mm","ms"];
+let P={};try{P=JSON.parse(localStorage.getItem("df-presets")||"{}")}catch(e){}
+const persist=()=>{try{localStorage.setItem("df-presets",JSON.stringify(P))}catch(e){toast("Storage is blocked, so presets last only until you close this page")}};
+function fillP(sel){const s=$("#ps");s.innerHTML='<option value="">Choose a preset…</option>'+Object.keys(P).map(n=>`<option>${esc(n)}</option>`).join("");if(sel)s.value=sel}
+$("#pv").onclick=()=>{const n=$("#pn").value.trim();if(!n)return toast("Name the preset first");
+ P[n]=Object.fromEntries(PIDS.map(i=>{const e=$("#"+i);return[i,e.type=="checkbox"?e.checked:e.value]}));persist();fillP(n);toast(`Saved preset “${n}”`)};
+$("#ps").onchange=()=>{const n=$("#ps").value,p=P[n];if(!p)return;
+ PIDS.forEach(i=>{const e=$("#"+i);if(!(i in p))return;if(e.type=="checkbox")e.checked=!!p[i];else e.value=p[i]});
+ $("#pn").value=n;refreshOut();toast("Preset applied. Press Convert to re-read the input with these settings")};
+$("#pd").onclick=()=>{const n=$("#ps").value;if(!n)return toast("Choose a preset to delete");delete P[n];persist();fillP();toast("Preset deleted")};
+$("#pe").onclick=()=>{if(!Object.keys(P).length)return toast("No presets to export");save(JSON.stringify(P,null,2),"dataforge-presets.json","application/json")};
+$("#pi").onclick=()=>$("#pf").click();
+$("#pf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+ try{const o=JSON.parse(await readFile(f));if(!o||typeof o!="object"||Array.isArray(o))throw 0;
+  let n=0;for(const k in o)if(o[k]&&typeof o[k]=="object"){P[k]=o[k];n++}
+  persist();fillP();toast(`Imported ${n} preset${n==1?"":"s"}`)}catch(x){toast("That file is not a DataForge presets file")}};
+fillP();
+
+/* XLSX import (built-in unzip + XML reader, no libraries) */
+async function unzip(buf){const v=new DataView(buf),u=new Uint8Array(buf);let e=-1;
+ for(let i=buf.byteLength-22;i>=0&&i>=buf.byteLength-65600;i--)if(v.getUint32(i,true)==0x06054b50){e=i;break}
+ if(e<0)throw Error("not a valid .xlsx file (zip header not found)");
+ const n=v.getUint16(e+10,true);let p=v.getUint32(e+16,true);const out={};
+ for(let k=0;k<n;k++){if(v.getUint32(p,true)!=0x02014b50)break;
+  const m=v.getUint16(p+10,true),cs=v.getUint32(p+20,true),nl=v.getUint16(p+28,true),el=v.getUint16(p+30,true),cl=v.getUint16(p+32,true),lo=v.getUint32(p+42,true);
+  out[new TextDecoder().decode(u.subarray(p+46,p+46+nl))]={m,cs,lo};p+=46+nl+el+cl}
+ return{async get(name){const f=out[name];if(!f)return null;const l=f.lo,ds=l+30+v.getUint16(l+26,true)+v.getUint16(l+28,true),d=u.subarray(ds,ds+f.cs);
+  if(f.m==0)return new TextDecoder().decode(d);
+  if(typeof DecompressionStream=="undefined")throw Error("this browser cannot unzip .xlsx files; use a current Chrome, Edge, Firefox or Safari");
+  return new TextDecoder().decode(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer())}}}
+async function readXlsx(buf){const z=await unzip(buf),X=t=>new DOMParser().parseFromString(t,"application/xml"),N=(d,t)=>[...d.getElementsByTagNameNS("*",t)];
+ const wbT=await z.get("xl/workbook.xml");if(!wbT)throw Error("this is not an Excel workbook (.xlsx). Old .xls files must be re-saved as .xlsx or CSV");
+ const rel={},rT=await z.get("xl/_rels/workbook.xml.rels");
+ if(rT)N(X(rT),"Relationship").forEach(r=>rel[r.getAttribute("Id")]=r.getAttribute("Target"));
+ const ss=[],sT=await z.get("xl/sharedStrings.xml");
+ if(sT)N(X(sT),"si").forEach(si=>ss.push(N(si,"t").filter(t=>t.parentNode.localName!="rPh").map(t=>t.textContent).join("")));
+ const dx=[],stT=await z.get("xl/styles.xml");
+ if(stT){const st=X(stT),cf={};N(st,"numFmt").forEach(x=>cf[x.getAttribute("numFmtId")]=x.getAttribute("formatCode"));
+  const xf=N(st,"cellXfs")[0];if(xf)[...xf.children].forEach(x=>{const id=+x.getAttribute("numFmtId"),c=cf[id];
+   dx.push((id>=14&&id<=22)||(id>=45&&id<=47)||!!(c&&!/general/i.test(c)&&/[dmyhs]/i.test(c.replace(/"[^"]*"|\[[^\]]*\]|\\./g,""))))})}
+ const col=r=>{let n=0;for(const ch of r.replace(/\d/g,""))n=n*26+ch.charCodeAt(0)-64;return n-1};
+ const ser=n=>{const iso=new Date(Math.round((n-25569)*864e5)).toISOString();return n%1===0?iso.slice(0,10):iso.slice(0,10)+" "+iso.slice(11,19)};
+ const sheets=[];
+ for(const sh of N(X(wbT),"sheet")){const id=sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id")||sh.getAttribute("r:id");
+  let t=rel[id];if(!t)continue;t=t.startsWith("/")?t.slice(1):"xl/"+t;const xT=await z.get(t);if(!xT)continue;
+  const rows=[];
+  N(X(xT),"row").forEach(r=>{const row=[];
+   N(r,"c").forEach(c=>{const ref=c.getAttribute("r"),ty=c.getAttribute("t"),vE=N(c,"v")[0];let val="";
+    if(ty=="inlineStr")val=N(c,"t").map(x=>x.textContent).join("");
+    else if(vE){const raw=vE.textContent;
+     if(ty=="s")val=ss[+raw]??"";else if(ty=="b")val=raw=="1"?"true":"false";else if(ty=="str"||ty=="e"||ty=="d")val=raw;
+     else{const n=parseFloat(raw);val=isNaN(n)?raw:dx[+c.getAttribute("s")]?ser(n):+n.toPrecision(15)}}
+    const i=ref?col(ref):row.length;while(row.length<i)row.push("");row[i]=val});
+   const ri=+r.getAttribute("r");while(ri&&rows.length<ri-1)rows.push([]);rows.push(row)});
+  const blank=r=>r.every(v=>String(v).trim()==="");while(rows.length&&blank(rows[rows.length-1]))rows.pop();while(rows.length&&blank(rows[0]))rows.shift();
+  sheets.push({name:sh.getAttribute("name"),rows})}
+ return{sheets}}
+async function fileToData(f){const x=f.name.split(".").pop().toLowerCase();
+ if(x=="xlsx"||x=="xlsm"){const wb=await readXlsx(await f.arrayBuffer());if(!wb.sheets.length)throw Error("no sheets");return fromRows(wb.sheets[0].rows,$("#hdr").checked)}
+ return build(await readFile(f),EXTMAP[x]||"auto")}
+async function loadXlsx(f){try{msg("Reading Excel file…");const wb=await readXlsx(await f.arrayBuffer());
+ if(!wb.sheets.length)throw Error("no sheets found");XL={name:f.name,sheets:wb.sheets};$("#in").value="";
+ $("#sh").innerHTML=wb.sheets.map((x,i)=>`<option value="${i}">${esc(x.name)} (${x.rows.length} rows)</option>`).join("");$("#shr").hidden=false;
+ useSheet(0);toast("Loaded "+f.name)}catch(e){msg("Could not read the Excel file: "+e.message+".","er")}}
+function useSheet(i){const x=XL.sheets[+i];snap();D=fromRows(x.rows.map(r=>r.slice()),$("#hdr").checked);STEPS.length=0;rawJSON=null;setBase();sort.c=-1;render();
+ msg(`Excel · sheet “${x.name}” · ${D.rows.length} rows × ${D.cols.length} columns`,"ok")}
+$("#sh").onchange=()=>useSheet($("#sh").value);
+$("#conv").onclick=()=>XL?useSheet($("#sh").value):parse();
+["src","dl","hdr"].forEach(i=>$("#"+i).onchange=()=>XL?(i=="hdr"&&useSheet($("#sh").value)):parse());
+
+/* transform steps (recipes) */
+const rec=x=>STEPS.push(x);
+function doSort(c,d){const num=D.rows.every(r=>r[c]===""||!isNaN(parseFloat(r[c])));
+ D.rows.sort((a,b)=>d*(num?(parseFloat(a[c])||0)-(parseFloat(b[c])||0):String(a[c]).localeCompare(String(b[c]),undefined,{numeric:true})))}
+const desc=x=>({trim:"Trim",empty:"Drop empty rows",dedupe:"Remove duplicates",transpose:"Transpose",heads:"Clean headers",colsaz:"Sort columns A–Z",addr:"Add row",addc:"Add column"})[x.t]||
+ (x.t=="fr"?`Replace “${x.f}” with “${x.rp}”${x.c=="*"?"":" in "+x.c}`:x.t=="cv"?`${x.c} → ${x.to}`:x.t=="jp"?`Path ${x.p}`:x.t=="mv"?`Move ${x.c} to position ${x.to+1}`:x.t=="rm"?`Remove ${x.c}`:x.t=="so"?`Sort by ${x.c} ${x.d>0?"↑":"↓"}`:x.t=="rn"?`Rename ${x.c} to ${x.to}`:x.t=="ce"?`Edit ${x.c}, row ${x.r+1}`:x.t);
+function steps(){$("#stl").innerHTML=STEPS.length?STEPS.map((x,i)=>`<span class="st">${i+1}. ${esc(desc(x))} <button data-sa="up" data-i="${i}" title="Move earlier" aria-label="Move earlier">‹</button><button data-sa="dn" data-i="${i}" title="Move later" aria-label="Move later">›</button>${SCH[x.t]?`<button data-sa="ed" data-i="${i}" title="Edit step" aria-label="Edit step">✎</button>`:""}<button data-sa="del" data-i="${i}" title="Remove step" aria-label="Remove step">✕</button></span>`).join(""):'<span class="stats">Nothing recorded yet. Clean-up steps you apply appear here.</span>'}
+function applyStep(x){const ci=n=>{const i=D.cols.indexOf(n);if(i<0)throw Error(`column “${n}” not found`);return i};
+ switch(x.t){
+  case"fr":runFR(x.f,x.rp,x.c,x.rx,x.mc);break;
+  case"cv":runCV(ci(x.c),x.to);break;
+  case"jp":runJP(x.p);break;
+  case"mv":doMove(ci(x.c),Math.min(x.to,D.cols.length-1));break;
+  case"rm":{const c=ci(x.c);D.cols.splice(c,1);D.rows.forEach(r=>r.splice(c,1));break}
+  case"so":doSort(ci(x.c),x.d);break;
+  case"rn":D.cols[ci(x.c)]=x.to;break;
+  case"ce":{const c=ci(x.c);if(!D.rows[x.r])throw Error("row "+(x.r+1)+" not found");D.rows[x.r][c]=x.v;break}
+  default:if(!tools[x.t])throw Error("unknown step");tools[x.t]()}
+ if(x.t!="jp")rawJSON=null}
+let R={};try{R=JSON.parse(localStorage.getItem("df-recipes")||"{}")}catch(e){}
+const persistR=()=>{try{localStorage.setItem("df-recipes",JSON.stringify(R))}catch(e){toast("Storage is blocked, so recipes last only until you close this page")}};
+function fillR(sel){const q=$("#rs");q.innerHTML='<option value="">Choose a recipe…</option>'+Object.keys(R).map(n=>`<option>${esc(n)}</option>`).join("");if(sel)q.value=sel}
+$("#rv").onclick=()=>{const n=$("#rn").value.trim();if(!n)return toast("Name the recipe first");if(!STEPS.length)return toast("No steps to save yet");
+ const st=STEPS.filter(x=>x.t!="ce");if(!st.length)return toast("Cell edits are not saved in recipes");R[n]=st.map(x=>({...x}));persistR();fillR(n);toast(`Saved recipe “${n}” (${st.length} steps${st.length<STEPS.length?", cell edits left out":""})`)};
+$("#rs").onchange=()=>{const n=$("#rs").value;if(n)$("#rn").value=n};
+$("#ra").onclick=()=>{const n=$("#rs").value,r=R[n];if(!r)return toast("Choose a recipe first");if(!D.cols.length)return toast("Load data first");
+ snap();let i=0;
+ try{for(;i<r.length;i++){applyStep(r[i]);rec(r[i])}}
+ catch(e){undoLast();render();return msg(`Recipe stopped at step ${i+1} (${desc(r[i])}): ${e.message}. No changes were made.`,"er")}
+ sort.c=-1;render();msg(`Applied recipe “${n}” (${r.length} steps)`,"ok")};
+$("#rd").onclick=()=>{const n=$("#rs").value;if(!n)return toast("Choose a recipe to delete");delete R[n];persistR();fillR();toast("Recipe deleted")};
+$("#rc").onclick=()=>{STEPS.length=0;setBase();steps();toast("Steps cleared. The current table is now the starting point")};
+$("#re").onclick=()=>{if(!Object.keys(R).length)return toast("No recipes to export");save(JSON.stringify(R,null,2),"dataforge-recipes.json","application/json")};
+$("#rim").onclick=()=>$("#rf").click();
+$("#rf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+ try{const o=JSON.parse(await readFile(f));if(!o||typeof o!="object"||Array.isArray(o))throw 0;let n=0;
+  for(const k in o)if(Array.isArray(o[k])&&o[k].every(x=>x&&typeof x.t=="string")){R[k]=o[k];n++}
+  persistR();fillR();toast(`Imported ${n} recipe${n==1?"":"s"}`)}catch(x){toast("That file is not a DataForge recipes file")}};
+fillR();
+
+/* column statistics */
+function stat(){const w=$("#vs");
+ if(!D.cols.length){w.innerHTML='<div class="empty">Load data to see column statistics.</div>';return}
+ NC=[];const f=n=>(Number.isInteger(n)?n:+n.toFixed(4)).toLocaleString("en-US",{maximumFractionDigits:4});
+ const body=D.cols.map((c,i)=>{const v=D.rows.map(r=>r[i]),ne=v.filter(x=>String(x).trim()!==""),n=ne.length,u=new Map();
+  ne.forEach(x=>{const k=String(x);u.set(k,(u.get(k)||0)+1)});
+  const nums=ne.map(x=>typeof x=="number"?x:/^\s*-?\d+(\.\d+)?([eE][+-]?\d+)?\s*$/.test(x)?parseFloat(x):NaN);
+  const isN=n&&nums.every(x=>!isNaN(x)),isB=n&&ne.every(x=>/^(true|false)$/i.test(String(x))),isD=n&&ne.every(x=>/^\d{4}-\d{2}-\d{2}/.test(String(x)));
+  const ty=!n?"empty":isB?"boolean":isN?"number":isD?"date":"text";if(ty=="number")NC.push(i);let mn="",mx="",me="",md="",sm="",sd="";
+  if(ty=="number"){const a=[...nums].sort((x,y)=>x-y),t=a.reduce((p,q)=>p+q,0),m=t/n;
+   mn=f(a[0]);mx=f(a[n-1]);sm=f(t);me=f(m);md=f(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2);sd=f(Math.sqrt(a.reduce((p,q)=>p+(q-m)**2,0)/n))}
+  else if(ty=="date"){const a=ne.map(String).sort();mn=a[0];mx=a[n-1]}
+  else if(ty=="text"){const l=ne.map(x=>String(x).length);mn="len "+l.reduce((a,b)=>Math.min(a,b));mx="len "+l.reduce((a,b)=>Math.max(a,b))}
+  const top=[...u].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,q])=>`${esc(k.length>18?k.slice(0,17)+"…":k)} <i>×${q}</i>`).join(", ");
+  return`<tr data-ci="${i}" class="${i==CH.c?"sel":""}" title="Click to chart this column"><td><b>${esc(c)}</b></td><td>${ty}</td><td><div class="bar" title="${n} of ${v.length} filled"><i style="width:${v.length?Math.round(n/v.length*100):0}%"></i></div></td><td>${v.length-n}</td><td>${u.size}</td><td>${esc(mn)}</td><td>${esc(mx)}</td><td>${me}</td><td>${md}</td><td>${sm}</td><td>${sd}</td><td>${top}</td></tr>`}).join("");
+ w.innerHTML=`<div class="tw"><table><thead><tr><th>Column</th><th>Type</th><th>Filled</th><th>Empty</th><th>Unique</th><th>Min</th><th>Max</th><th>Mean</th><th>Median</th><th>Sum</th><th>Std dev</th><th>Most common</th></tr></thead><tbody>${body}</tbody></table></div><div class="stats" style="margin-top:6px">${D.rows.length} rows · empty means blank cells · standard deviation is for the whole column. Click a row to chart that column.</div>`+chartUI();chart()}
+
+/* undo, base data and step editing */
+function setBase(){EP++;BASE={d:JSON.stringify(D),raw:rawJSON}}
+function popUndo(){D=JSON.parse(hist.pop());const q=sl.pop();if(q.e!=EP){EP=q.e;BASE=null;STEPS.length=0}else{STEPS.length=0;STEPS.push(...q.s)}}
+function changeSteps(next,ok){
+ if(!BASE)return toast("Editing steps needs the originally loaded data. Load the file again first");
+ const old=STEPS.slice(),rj=rawJSON;snap();D=JSON.parse(BASE.d);rawJSON=BASE.raw;STEPS.length=0;let i=0;
+ try{for(;i<next.length;i++){applyStep(next[i]);rec(next[i])}}
+ catch(e){popUndo();STEPS.length=0;STEPS.push(...old);rawJSON=rj;render();return msg(`Step ${i+1} (${desc(next[i])}) failed: ${e.message}. Your steps were not changed.`,"er")}
+ sort.c=-1;render();msg(ok||"Steps re-run from the loaded data","ok")}
+const SCH={fr:[["f","Find","t"],["rp","Replace with","t"],["c","Column name (* = all columns)","t"],["rx","Regex","b"],["mc","Match case","b"]],
+ cv:[["c","Column name","t"],["to","Convert to","s",Object.keys(CV)]],jp:[["p","JSON path","t"]],
+ so:[["c","Column name","t"],["d","Direction (1 = ascending, -1 = descending)","s",["1","-1"]]],
+ mv:[["c","Column name","t"],["to","New position (0 = first)","t"]],rn:[["c","Current column name","t"],["to","New name","t"]],
+ ce:[["c","Column name","t"],["r","Row (0 = first)","t"],["v","Value","t"]]};
+let EI=-1;
+function openEdit(i){const x=STEPS[i],sc=SCH[x.t];if(!sc)return;EI=i;
+ $("#sf").innerHTML=`<div class="stats">${esc(desc(x))}</div>`+sc.map(([k,l,t,o])=>t=="b"?`<label class="ck" style="flex-direction:row;margin:8px 0"><input type="checkbox" id="sf_${k}"${x[k]?" checked":""}> ${l}</label>`:t=="s"?`<label>${l}<select id="sf_${k}">${o.map(q=>`<option${q==x[k]?" selected":""}>${q}</option>`).join("")}</select></label>`:`<label>${l}<input id="sf_${k}" value="${esc(x[k])}"></label>`).join("");
+ $("#sd").showModal()}
+$("#sds").onclick=()=>{const x=STEPS[EI],nx={...x};
+ SCH[x.t].forEach(([k,l,t])=>{const e=$("#sf_"+k);nx[k]=t=="b"?e.checked:typeof x[k]=="number"&&e.value.trim()!==""&&!isNaN(+e.value)?+e.value:e.value});
+ $("#sd").close();const n=STEPS.slice();n[EI]=nx;changeSteps(n,"Step updated. Table rebuilt from the loaded data")};
+$("#sdc").onclick=()=>$("#sd").close();
+$("#stl").addEventListener("click",e=>{const b=e.target.closest("button[data-sa]");if(!b)return;const i=+b.dataset.i,a=b.dataset.sa,n=STEPS.slice();
+ if(a=="del"){n.splice(i,1);changeSteps(n,"Step removed. Table rebuilt from the loaded data")}
+ else if(a=="ed")openEdit(i);
+ else{const j=a=="up"?i-1:i+1;if(j<0||j>=n.length)return;[n[i],n[j]]=[n[j],n[i]];changeSteps(n,"Steps reordered. Table rebuilt from the loaded data")}});
+
+/* XLSX export (built-in zip writer, no libraries) */
+const crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=-1;for(let i=0;i<u.length;i++)c=crcT[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0};
+function zipBlob(files,mime){const en=new TextEncoder(),parts=[],cd=[],now=new Date();let off=0;
+ const dt=((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate(),tm=(now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1);
+ for(const[name,txt]of Object.entries(files)){const nb=en.encode(name),d=en.encode(txt),c=crc32(d);
+  const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,tm,true);h.setUint16(12,dt,true);h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nb.length,true);
+  parts.push(h.buffer,nb,d);
+  const e=new DataView(new ArrayBuffer(46));e.setUint32(0,0x02014b50,true);e.setUint16(4,20,true);e.setUint16(6,20,true);e.setUint16(8,0x0800,true);e.setUint16(12,tm,true);e.setUint16(14,dt,true);e.setUint32(16,c,true);e.setUint32(20,d.length,true);e.setUint32(24,d.length,true);e.setUint16(28,nb.length,true);e.setUint32(42,off,true);
+  cd.push(e.buffer,nb);off+=30+nb.length+d.length}
+ const n=Object.keys(files).length,cl=cd.reduce((a,b)=>a+b.byteLength,0),z=new DataView(new ArrayBuffer(22));
+ z.setUint32(0,0x06054b50,true);z.setUint16(8,n,true);z.setUint16(10,n,true);z.setUint32(12,cl,true);z.setUint32(16,off,true);
+ return new Blob([...parts,...cd,z.buffer],{type:mime})}
+const saveBlob=(b,n)=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};
+const colL=n=>{let t="";for(n++;n>0;n=Math.floor((n-1)/26))t=String.fromCharCode(65+(n-1)%26)+t;return t};
+const xe=t=>String(t).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function xlsxBlob(){const inf=$("#inf").checked,h=$("#oh").checked,nc=D.cols.length,out=[],H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',NS='xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"';
+ const cellX=(v,r,c)=>{const ref=colL(c)+r;if(v===null||v===undefined||v==="")return"";if(inf)v=infer(v);if(v===null)return"";
+  if(typeof v=="number"&&isFinite(v))return`<c r="${ref}"><v>${v}</v></c>`;
+  if(typeof v=="boolean")return`<c r="${ref}" t="b"><v>${+v}</v></c>`;
+  const q=String(v);
+  if(inf&&/^\d{4}-\d{2}-\d{2}$/.test(q)){const t=Date.parse(q+"T00:00:00Z");if(!isNaN(t))return`<c r="${ref}" s="2"><v>${t/864e5+25569}</v></c>`}
+  return`<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xe(q)}</t></is></c>`};
+ let r=0;
+ if(h){r=1;out.push(`<row r="1">`+D.cols.map((c,i)=>`<c r="${colL(i)}1" s="1" t="inlineStr"><is><t xml:space="preserve">${xe(c)}</t></is></c>`).join("")+"</row>")}
+ D.rows.forEach(row=>{r++;out.push(`<row r="${r}">`+row.map((v,i)=>cellX(v,r,i)).join("")+"</row>")});
+ const cols=D.cols.map((c,i)=>{let m=String(c).length;for(let k=0;k<Math.min(200,D.rows.length);k++)m=Math.max(m,String(D.rows[k][i]??"").length);
+  return`<col min="${i+1}" max="${i+1}" width="${Math.min(60,Math.max(8,m+3))}" customWidth="1"/>`}).join("");
+ const sheet=H+`<worksheet ${NS}><sheetViews><sheetView workbookViewId="0">${h?'<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>':""}</sheetView></sheetViews>${nc?`<cols>${cols}</cols>`:""}<sheetData>${out.join("")}</sheetData>${h&&nc?`<autoFilter ref="A1:${colL(nc-1)}${Math.max(r,1)}"/>`:""}</worksheet>`;
+ const R="http://schemas.openxmlformats.org/officeDocument/2006/relationships",P="http://schemas.openxmlformats.org/package/2006/relationships";
+ return zipBlob({
+  "[Content_Types].xml":H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>',
+  "_rels/.rels":H+`<Relationships xmlns="${P}"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+  "xl/workbook.xml":H+`<workbook ${NS} xmlns:r="${R}"><sheets><sheet name="Data" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+  "xl/_rels/workbook.xml.rels":H+`<Relationships xmlns="${P}"><Relationship Id="rId1" Type="${R}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="${R}/styles" Target="styles.xml"/></Relationships>`,
+  "xl/styles.xml":H+`<styleSheet ${NS}><numFmts count="1"><numFmt numFmtId="164" formatCode="yyyy\\-mm\\-dd"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE6E1FA"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`,
+  "xl/worksheets/sheet1.xml":sheet},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+
+/* charts from column statistics */
+let NC=[],CH={c:0,m:"count",n:10},lastSvg="",chW=640,chH=300;
+const nf=n=>Number.isInteger(n)?n.toLocaleString("en-US"):(+n.toFixed(2)).toLocaleString("en-US");
+const numv=x=>typeof x=="number"?x:/^\s*-?\d+(\.\d+)?([eE][+-]?\d+)?\s*$/.test(x)?parseFloat(x):NaN;
+function chartUI(){CH.c=Math.min(CH.c,D.cols.length-1);
+ const o=(a,b,sel)=>`<option value="${a}"${a==sel?" selected":""}>${esc(b)}</option>`;
+ const ms=o("count","Count",CH.m)+NC.filter(j=>j!=CH.c).map(j=>o("s"+j,"Sum of "+D.cols[j],CH.m)+o("a"+j,"Average of "+D.cols[j],CH.m)).join("");
+ return`<div class="row xf" style="margin-top:10px"><div class="row"><b>Chart</b><select data-ch="c" aria-label="Column">${D.cols.map((c,i)=>o(i,c,CH.c)).join("")}</select><select data-ch="m" aria-label="Measure">${ms}</select><select data-ch="n" aria-label="Number of bars">${[5,10,20,30].map(n=>o(n,"Top "+n,CH.n)).join("")}</select><button class="btn" data-sv="svg">Save SVG</button><button class="btn" data-sv="png">Save PNG</button></div><div id="chs"></div></div>`}
+function chart(){const el=$("#chs");if(!el)return;const c=CH.c,ne=D.rows.map(r=>r[c]).filter(x=>String(x).trim()!==""),
+ css=getComputedStyle(document.documentElement),g=k=>css.getPropertyValue(k).trim(),ac=g("--ac"),ac2=g("--ac2"),tx=g("--tx"),mu=g("--mut"),bg=document.documentElement.dataset.theme=="dark"?"#1d1740":"#ffffff";
+ if(!ne.length){el.innerHTML='<div class="empty">This column has no values to chart.</div>';lastSvg="";return}
+ const isN=ne.every(x=>!isNaN(numv(x)));let bars=[],title,vert=false;
+ if(isN&&CH.m=="count"){const a=ne.map(numv),mn=a.reduce((p,q)=>Math.min(p,q)),mx=a.reduce((p,q)=>Math.max(p,q)),k=Math.max(3,Math.min(12,Math.ceil(Math.log2(a.length)+1))),w=(mx-mn)/k||1,cnt=Array(k).fill(0);
+  a.forEach(x=>cnt[Math.min(k-1,Math.floor((x-mn)/w))]++);bars=cnt.map((n,i)=>({l:nf(mn+i*w)+" – "+nf(mn+(i+1)*w),v:n}));vert=true;title=`Distribution of ${D.cols[c]} (${a.length} values)`}
+ else{const m=new Map(),kind=CH.m[0],j=+CH.m.slice(1);
+  D.rows.forEach(r=>{const key=String(r[c]).trim()===""?"(empty)":String(r[c]);let o=m.get(key);if(!o){o={s:0,n:0};m.set(key,o)}
+   if(kind=="c"){o.s++;o.n++}else{const x=numv(r[j]);if(!isNaN(x)){o.s+=x;o.n++}}});
+  bars=[...m].map(([l,o])=>({l,v:kind=="a"?(o.n?o.s/o.n:0):o.s})).sort((a,b)=>b.v-a.v).slice(0,CH.n);
+  title=kind=="c"?`Most common values in ${D.cols[c]}`:`${kind=="s"?"Sum":"Average"} of ${D.cols[j]} by ${D.cols[c]}`}
+ const mxv=bars.reduce((p,b)=>Math.max(p,Math.abs(b.v)),0)||1,tl=(t,n)=>t.length>n?t.slice(0,n-1)+"…":t;let W=640,H,body="";
+ if(vert){const L=44,T=44,B=76,bw=(W-L-50)/bars.length;H=300;const ph=H-T-B;
+  body=bars.map((b,i)=>{const h=Math.max(1,ph*Math.abs(b.v)/mxv),x=L+i*bw+3,y=T+ph-h;
+   return`<rect x="${x}" y="${y}" width="${bw-6}" height="${h}" rx="4" fill="url(#g)"/><text x="${x+(bw-6)/2}" y="${y-5}" text-anchor="middle" fill="${mu}" font-size="11">${nf(b.v)}</text><text transform="translate(${x+(bw-6)/2},${T+ph+14}) rotate(40)" fill="${tx}" font-size="10">${esc(b.l)}</text>`}).join("")+`<line x1="${L}" y1="${T+ph}" x2="${W-40}" y2="${T+ph}" stroke="${mu}" opacity=".4"/>`}
+ else{const L=170,R=70,rh=28;H=Math.max(90,bars.length*rh+56);
+  body=bars.map((b,i)=>{const y=44+i*rh,w=Math.max(1,(W-L-R)*Math.abs(b.v)/mxv);
+   return`<text x="${L-8}" y="${y+14}" text-anchor="end" fill="${tx}">${esc(tl(b.l,24))}</text><rect x="${L}" y="${y+1}" width="${w}" height="19" rx="5" fill="url(#g)"/><text x="${L+w+6}" y="${y+15}" fill="${mu}">${nf(b.v)}</text>`}).join("")}
+ lastSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="12"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="${ac}"/><stop offset="1" stop-color="${ac2}"/></linearGradient></defs><rect width="100%" height="100%" rx="14" fill="${bg}"/><text x="16" y="26" font-size="14" font-weight="700" fill="${tx}">${esc(title)}</text>${body}</svg>`;
+ chW=W;chH=H;el.innerHTML=lastSvg}
+function saveChart(t){if(!lastSvg)return toast("Nothing to save");
+ if(t=="svg"){saveBlob(new Blob([lastSvg],{type:"image/svg+xml"}),"dataforge-chart.svg");return}
+ const img=new Image();img.onload=()=>{const cv=document.createElement("canvas");cv.width=chW*2;cv.height=chH*2;const x=cv.getContext("2d");x.scale(2,2);x.drawImage(img,0,0);cv.toBlob(b=>b?saveBlob(b,"dataforge-chart.png"):toast("PNG export failed. Use SVG instead"))};
+ img.onerror=()=>toast("PNG export failed in this browser. Use SVG instead");img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(lastSvg)}
+$("#vs").addEventListener("change",e=>{const k=e.target.dataset.ch;if(!k)return;CH[k]=k=="m"?e.target.value:+e.target.value;if(k=="c")CH.m="count";stat()});
+$("#vs").addEventListener("click",e=>{const b=e.target.closest("[data-sv]");if(b)return saveChart(b.dataset.sv);
+ const tr=e.target.closest("tr[data-ci]");if(tr){CH.c=+tr.dataset.ci;CH.m="count";stat()}});
+
+/* theme + changelog */
+let th="light";try{th=localStorage.getItem("df-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){}
+const setTh=t=>{document.documentElement.dataset.theme=t;try{localStorage.setItem("df-theme",t)}catch(e){}};setTh(th);
+$("#theme").onclick=()=>setTh(document.documentElement.dataset.theme=="dark"?"light":"dark");
+$("#vbtn").onclick=()=>$("#log").showModal();$("#lc").onclick=()=>$("#log").close();
+$("#log").addEventListener("click",e=>{if(e.target==e.currentTarget)e.currentTarget.close()});
+render();
+})();
+</script>
+</body>
+</html>

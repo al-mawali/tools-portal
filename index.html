@@ -588,7 +588,217 @@ const TOOLS = [
     ],
     color1: "#ff7a59", color2: "#ff4fa3",
     open: false
+  }, 
+  
+  /* ==================== PART 2: the new tools (inside TOOLS) ==================== */
+  /* ---------- UTILITY TOOLS ---------- */
+  {
+    name: "Password Generator",
+    tag: "Security",
+    tagline: "Strong passwords in one click. Zero internet required.",
+    description: "Craft strong, random passwords exactly the way you need them. Set the length, choose your criteria and complexity, and generate in an instant. Everything runs inside your browser, with no external calls and no internet access, so nothing ever leaves your device.",
+    features: [
+      "Generate by your own criteria, length and complexity",
+      "100% offline: no external calls, no internet access",
+      "Fast, simple and private by design"
+    ],
+    url: "./tools/password-generator.html",
+    flags: ["offline", "new"],
+    icon: "key",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#22d3b6", color2: "#3b9bff",
+    open: false
+  },
+  {
+    name: "DiffDesk",
+    tag: "Developer",
+    tagline: "Spot every difference. Merge with confidence.",
+    description: "A side-by-side compare tool in the spirit of Beyond Compare. Load two text files or paste two pieces of content, see exactly what changed, and move changes across with a click. Runs fully offline with no external calls and no internet access.",
+    features: [
+      "Compare two text files or pasted content",
+      "Differences highlighted clearly",
+      "Sync scroll on or off, your choice",
+      "Move changes between the two sides",
+      "Export a summary or export the resulting file",
+      "100% offline: no external calls, no internet access"
+    ],
+    url: "./tools/diffdesk.html",
+    flags: ["offline", "new"],
+    icon: "diff",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#4f8cff", color2: "#a45cff",
+    open: false
+  },
+  {
+    name: "Palette Studio",
+    tag: "Design",
+    tagline: "Generate, lock, tweak. Palettes that just feel right.",
+    description: "Spin up fresh colour palettes in seconds. Found a colour you love? Lock it, keep generating around it, then fine-tune every shade until the palette is exactly right.",
+    features: [
+      "Instant colour palette generation",
+      "Lock the colours you want to keep",
+      "Tweak and fine-tune each colour"
+    ],
+    url: "./tools/palette-studio.html",
+    flags: ["new"],
+    icon: "palette",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#ff4fa3", color2: "#ff9a5c",
+    open: false
+  },
+  {
+    name: "QR Generator",
+    tag: "Utility",
+    tagline: "Links, WiFi and contacts, turned into a scan in a snap.",
+    description: "Create QR codes for the things people actually share: website links, WiFi access and contact details. Type it, generate it, scan it.",
+    features: [
+      "QR codes for links",
+      "QR codes for WiFi access",
+      "QR codes for contacts"
+    ],
+    url: "./tools/qr_gen.html",
+    flags: ["new"],
+    icon: "qr",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#7a5cff", color2: "#4f8cff",
+    open: false
+  },
+  {
+    name: "CipherDesk",
+    tag: "Security",
+    tagline: "Encrypt it. Decrypt it. Your desk for every cipher.",
+    description: "A full encryption and decryption workbench with a wide range of encryption types and features, built to take you from a readable message to a locked one and back again.",
+    features: [
+      "Encrypt and decrypt in one place",
+      "Wide range of encryption types",
+      "Wide range of features"
+    ],
+    url: "./tools/cipherdesk.html",
+    flags: ["new"],
+    icon: "shield",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#ff5c7a", color2: "#a45cff",
+    open: false
+  },
+  {
+    name: "FormatForge",
+    tag: "Developer",
+    tagline: "Validate. Format. Forge clean code from messy data.",
+    description: "A validator and formatter for JSON, YAML, XML and more, packed with features. Paste messy data, catch the errors and get it back clean and readable.",
+    features: [
+      "Validate JSON, YAML, XML and more",
+      "Format and beautify with one click",
+      "Wide range of features"
+    ],
+    url: "./tools/formatforge.html",
+    flags: ["new"],
+    icon: "braces",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#ffb020", color2: "#ff7a59",
+    open: false
+  },
+  {
+    name: "DataForge",
+    tag: "Developer",
+    tagline: "CSV, JSON, tables. Convert anything, prettify everything.",
+    description: "Convert between CSV, JSON and tables, and make the result look great. Import your data, transform it, then export it in the format you need, with a wide range of features along the way.",
+    features: [
+      "Convert between CSV, JSON and tables",
+      "Prettify your data",
+      "Import and export support",
+      "Wide range of features"
+    ],
+    url: "./tools/dataforge.html",
+    flags: ["new"],
+    icon: "table",
+    version: "1.4.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#3ddc84", color2: "#22a7d3",
+    open: false
+  },
+
+  /* ---------- ENTERTAINMENT ---------- */
+  {
+    name: "Memory Match",
+    tag: "Entertainment",
+    tagline: "Flip, match, repeat. A quick break that is actually fun.",
+    description: "A classic memory card game with a twist: pick your theme and test your memory. Choose from emoji, flags or office items and see how fast you can find every pair.",
+    features: [
+      "Themes: emoji, flags and office items",
+      "Quick mini game, perfect for a short break"
+    ],
+    url: "./entertainments/memory-match.html",
+    flags: ["new"],
+    icon: "gamepad",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#ff7a59", color2: "#ff4fa3",
+    open: false
+  },
+  {
+    name: "Roll, Flip & Decide",
+    tag: "Entertainment",
+    tagline: "Can't decide? Let the dice, the coin or fate do it.",
+    description: "Roll the dice, flip a coin or let the decision maker pick for you, all with smooth, satisfying animations. Tough choices have never been this entertaining.",
+    features: [
+      "Dice roller",
+      "Coin flip",
+      "Decision maker",
+      "Fun animations throughout"
+    ],
+    url: "./entertainments/roll-flip-decide.html",
+    flags: ["new"],
+    icon: "dice",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#a45cff", color2: "#ff4fa3",
+    open: false
+  },
+  {
+    name: "Breathe",
+    tag: "Wellness",
+    tagline: "Pause. Inhale. Exhale. Reset in a minute.",
+    description: "A calming breathing exercise guide with a visual pacer. Follow the rhythm on screen, slow down, and give your mind a moment to reset between tasks.",
+    features: [
+      "Guided breathing exercise",
+      "Visual pacer to follow the rhythm"
+    ],
+    url: "./entertainments/breathe.html",
+    flags: ["new"],
+    icon: "wind",
+    version: "1.0.0",
+    changelog: [
+      //{ version: "1.0.0", date: "2026-11-22", changes: [{ type: "new", text: "Initial release." }] }
+    ],
+    color1: "#22d3b6", color2: "#4f8cff",
+    open: false
   }
+/* ========================== END OF PART 2 ================================== */
+  
 ];
 
 /* =========================================================
@@ -598,9 +808,17 @@ const TOOLS = [
    a new entry at the TOP of CHANGELOG.
    type : "new" | "improved" | "fixed" | "removed"
    ========================================================= */
-const SITE = { version: "1.1.0", updated: "2026-11-18" };
+const SITE = { version: "1.2.0", updated: "2026-11-22" };
 
 const CHANGELOG = [
+{
+    version: "1.2.0", date: "2026-11-22",
+    changes: [
+      { type: "new", text: "Added 10 new tools: Password Generator, DiffDesk, Palette Studio, QR Generator, CipherDesk, FormatForge, DataForge, Memory Match, Roll, Flip & Decide and Breathe." },
+      { type: "new", text: "New 'Works Offline' flag for tools that need no internet access." },
+      { type: "improved", text: "Added icons for the new tools." }
+    ]
+  },
   {
     version: "1.1.0", date: "2026-11-18",
     changes: [
@@ -729,6 +947,27 @@ function renderEntries(entries) {
       ${(e.changes || []).map(c => `<div class="chg"><span class="chg-type ${esc(c.type)}">${esc(LABELS[c.type] || c.type)}</span><span>${esc(c.text)}</span></div>`).join('')}
     </div>`).join('');
 }
+/* ==================== PART 1: new icons + "Offline" flag ==================== */
+const _svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+
+Object.assign(ICONS, {
+  key:     _svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>'),
+  diff:    _svg('<rect x="3" y="4" width="7.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="7.5" height="16" rx="1.5"/><path d="M5.5 9h3M5.5 13h3M16 9h3M16 15h3"/>'),
+  gamepad: _svg('<rect x="2" y="6" width="20" height="12" rx="5"/><path d="M6 12h4M8 10v4M15.5 11h.01M18 13h.01"/>'),
+  palette: _svg('<path d="M12 3a9 9 0 100 18c1.4 0 2-1 2-2 0-1.5-1-1.7-1-3 0-1 .8-2 2-2h3a3 3 0 003-3c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>'),
+  dice:    _svg('<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1"/><circle cx="15.5" cy="8.5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="8.5" cy="15.5" r="1"/><circle cx="15.5" cy="15.5" r="1"/>'),
+  wind:    _svg('<path d="M3 8h11a3 3 0 10-3-3M3 12h16a3 3 0 11-3 3M3 16h8a2.5 2.5 0 11-2.5 2.5"/>'),
+  qr:      _svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M17 20h4M20 17v3"/>'),
+  shield:  _svg('<path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"/><circle cx="12" cy="11" r="2"/><path d="M12 13v3"/>'),
+  braces:  _svg('<path d="M8 4C6 4 5 5 5 7v3c0 1-1 2-2 2 1 0 2 1 2 2v3c0 2 1 3 3 3M16 4c2 0 3 1 3 3v3c0 1 1 2 2 2-1 0-2 1-2 2v3c0 2-1 3-3 3"/>'),
+  table:   _svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/>')
+});
+
+/* New flag: "offline" (works with no internet / no external calls) */
+FLAG_ICONS.wifioff = '<path d="M2 2l20 20M5 12.5a10 10 0 015-2.7M8.5 16a5 5 0 015-1.2M12 20h.01M16.5 9a14 14 0 015.5 3.2M2 8.8a15 15 0 014.2-2.6"/>';
+FLAGS["offline"] = { label: "Works Offline", color: "#22d3b6", icon: "wifioff", desc: "No internet and no external calls needed" };
+/* ========================== END OF PART 1 ================================== */
+
 
 const cardsEl = $('#cards');
 TOOLS.forEach((t, i) => {

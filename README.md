@@ -4,7 +4,7 @@ A showcase page for the tools and applications developed by **Habib AlMawali**.
 
 It is a single, self-contained with no build step, no frameworks and no external requests (no CDN, no web fonts), so it also runs on an on-prem web server.
 
-**Live site:** `https://al-mawali.github.io/tools-portal/`
+**Live site:** `https://tools.al-mawali.com`
 
 ---
 

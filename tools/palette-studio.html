@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Palette Studio</title>
+<style>
+:root{--bg:#14121c;--panel:#1f1c2b;--line:#ffffff1f;--tx:#f4f2fa;--mut:#a9a3bd;--acc:#8b7bff;--r:22px;
+--font:ui-rounded,"SF Pro Rounded","Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",sans-serif}
+@media (prefers-color-scheme:light){:root{--bg:#f1eff8;--panel:#fff;--line:#0000001a;--tx:#1b1830;--mut:#6a6482;--acc:#5a46f0}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);display:flex;flex-direction:column;height:100dvh;overflow:hidden;
+padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+header{display:flex;align-items:center;gap:12px;padding:12px clamp(12px,2.5vw,28px);flex-wrap:wrap}
+.logo{font-weight:800;font-size:1.25rem;letter-spacing:-.03em;display:flex;align-items:center;gap:10px;margin-right:auto}
+.logo i{width:30px;height:30px;border-radius:10px;background:conic-gradient(from 200deg,#ff6b8b,#ffb86b,#6bffb8,#6bb8ff,#8b7bff,#ff6b8b)}
+.bar{display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px}
+.pill{border-radius:999px;padding:9px 16px;font-weight:600;font-size:.9rem;transition:background .15s,transform .1s;white-space:nowrap}
+.pill:hover{background:var(--line)}.pill:active{transform:scale(.95)}
+.pill.go{background:var(--acc);color:#fff}.pill.go:hover{background:var(--acc);filter:brightness(1.1)}
+.pill:disabled{opacity:.35;pointer-events:none}
+select{background:transparent;border:0;font-weight:600;font-size:.9rem;padding:9px 6px;color:inherit;cursor:pointer}
+select option{color:#111}
+.cnt{display:flex;align-items:center}.cnt b{min-width:1.6em;text-align:center}
+main{flex:1;display:flex;gap:8px;padding:0 clamp(8px,2vw,24px);min-height:0}
+.sw{flex:1;min-width:0;border-radius:var(--r);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:22px 8px;
+position:relative;transition:flex .35s cubic-bezier(.3,1.4,.5,1),background-color .35s;overflow:hidden}
+.sw:hover{flex:1.35}
+.sw.sel{box-shadow:inset 0 0 0 4px #fff9}
+.hex{font-size:clamp(1rem,2vw,1.6rem);font-weight:800;letter-spacing:.02em;padding:6px 10px;border-radius:12px;font-variant-numeric:tabular-nums}
+.hex:hover{background:#00000018}
+.nm{font-size:.78rem;opacity:.7;margin-top:-8px}
+.act{display:flex;gap:4px;flex-direction:column}
+.act button{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;transition:background .15s}
+.act button:hover{background:#00000022}
+.act svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sw.lk .act .lock{background:#00000026}
+footer{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px clamp(12px,2.5vw,28px);font-size:.85rem;color:var(--mut)}
+footer b{color:var(--tx)}
+.link{text-decoration:underline;text-underline-offset:3px;color:var(--tx);font-weight:600}
+.hint{opacity:.8}
+/* sheet */
+.sheet{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translate(-50%,160%);width:min(520px,calc(100% - 20px));
+background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 20px 60px #0008;transition:transform .35s cubic-bezier(.3,1.3,.5,1);z-index:5}
+.sheet.on{transform:translate(-50%,0)}
+.sheet h3{font-size:1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.row{display:grid;grid-template-columns:24px 1fr 44px;gap:12px;align-items:center;margin:10px 0;font-size:.85rem;color:var(--mut)}
+.row output{color:var(--tx);text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;height:14px;border-radius:99px;width:100%;cursor:pointer;border:1px solid var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #222;box-shadow:0 2px 8px #0006}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #222}
+.hx{display:flex;gap:10px;align-items:center;margin-top:14px}
+.hx input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:700;letter-spacing:.04em}
+.chip{width:44px;height:44px;border-radius:14px;border:1px solid var(--line)}
+/* dialogs */
+dialog{margin:auto;border:1px solid var(--line);border-radius:26px;background:var(--panel);color:var(--tx);width:min(560px,calc(100% - 24px));max-height:86dvh;padding:0;overflow:hidden}
+dialog::backdrop{background:#000a;backdrop-filter:blur(6px)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:18px 20px 8px}
+.dh h2{font-size:1.2rem;letter-spacing:-.02em}
+.db{padding:8px 20px 20px;overflow:auto;max-height:calc(86dvh - 70px)}
+.tabs{display:flex;gap:4px;margin-bottom:10px}
+.tabs .pill{background:var(--bg)}.tabs .pill.on{background:var(--acc);color:#fff}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px;font:.82rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;overflow:auto;max-height:44dvh;white-space:pre}
+.ver{border-left:3px solid var(--acc);padding:2px 0 2px 14px;margin:14px 0}
+.ver h4{font-size:1rem}.ver small{color:var(--mut)}
+.ver ul{margin:6px 0 0 18px;line-height:1.6;font-size:.92rem}
+.tag{display:inline-block;background:var(--acc);color:#fff;border-radius:99px;padding:1px 9px;font-size:.72rem;margin-left:6px}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-200%);background:var(--tx);color:var(--bg);padding:11px 20px;border-radius:99px;font-weight:700;transition:transform .3s cubic-bezier(.3,1.5,.5,1);z-index:9}
+.toast.on{transform:translate(-50%,0)}
+@media (max-width:760px){
+ main{flex-direction:column;gap:6px}
+ .sw{flex-direction:row;justify-content:space-between;padding:6px 8px 6px 14px;align-items:center;gap:6px}
+ .sw:hover{flex:1}
+ .hex{font-size:1.15rem}.nm{display:none}
+ .act{flex-direction:row}.act button{width:40px;height:40px}
+ .hint{display:none}
+ header{gap:8px}.logo{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo"><i></i>Palette Studio</div>
+ <div class="bar">
+  <select id="mode" aria-label="Harmony">
+   <option value="random">Random</option><option value="analogous">Analogous</option><option value="complementary">Complementary</option>
+   <option value="triad">Triad</option><option value="mono">Monochrome</option>
+  </select>
+  <span class="cnt"><button class="pill" id="less" aria-label="Fewer colors">−</button><b id="n">5</b><button class="pill" id="more" aria-label="More colors">+</button></span>
+ </div>
+ <div class="bar">
+  <button class="pill" id="undo" aria-label="Undo">Undo</button>
+  <button class="pill" id="redo" aria-label="Redo">Redo</button>
+  <button class="pill" id="exp">Export</button>
+  <button class="pill go" id="gen">Generate</button>
+ </div>
+</header>
+<main id="main" aria-live="polite"></main>
+<footer>
+ <span>Developed by <b>Habib AlMawali</b> · <button class="link" id="ver">v1.0.0 · Changelog</button></span>
+ <span class="hint">Press Space to generate · Ctrl/⌘+Z to undo · Works fully offline</span>
+</footer>
+
+<div class="sheet" id="sheet" role="dialog" aria-label="Tweak color">
+ <h3><span id="stt">Tweak color</span><button class="pill" id="sx">Done</button></h3>
+ <div class="row">H<input type="range" id="h" min="0" max="360"><output id="ho"></output></div>
+ <div class="row">S<input type="range" id="s" min="0" max="100"><output id="so"></output></div>
+ <div class="row">L<input type="range" id="l" min="0" max="100"><output id="lo"></output></div>
+ <div class="hx"><div class="chip" id="chip"></div><input id="hexin" maxlength="7" spellcheck="false" aria-label="Hex value"></div>
+</div>
+
+<dialog id="dx">
+ <div class="dh"><h2>Export palette</h2><button class="pill" data-close>Close</button></div>
+ <div class="db">
+  <div class="tabs" id="tabs"><button class="pill on" data-f="css">CSS</button><button class="pill" data-f="json">JSON</button><button class="pill" data-f="hex">HEX</button></div>
+  <pre id="out"></pre>
+  <p style="margin-top:12px"><button class="pill go" id="cp">Copy to clipboard</button></p>
+ </div>
+</dialog>
+
+<dialog id="dv">
+ <div class="dh"><h2>Changelog</h2><button class="pill" data-close>Close</button></div>
+ <div class="db">
+  <div class="ver"><h4>v1.0.0 <span class="tag">Latest</span></h4><small>22 Nov 2026</small>
+   <ul><li>Palette generator with Random, Analogous, Complementary, Triad and Monochrome harmonies</li>
+   <li>Lock any color so it survives every new generation</li>
+   <li>Tweak hue, saturation, lightness or type an exact HEX</li>
+   <li>Add or remove colors (3–8)</li>
+   <li>Undo and redo history</li>
+   <li>Export as CSS variables, JSON or HEX list</li>
+   <li>Responsive layout for desktop, tablet and phone</li>
+   <li>100% offline: one file, no network requests, no external fonts or scripts</li></ul></div>
+  <div class="ver"><h4>Planned</h4><small>Next</small>
+   <ul><li>Accessibility contrast checker</li><li>Saved palette library</li><li>Image color extraction</li></ul></div>
+  <p style="color:var(--mut);font-size:.85rem;margin-top:14px">Developed by Habib AlMawali</p>
+ </div>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const VERSION="1.0.0";
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const h2x=(h,s,l)=>{s/=100;l/=100;const a=s*Math.min(l,1-l),k=n=>(n+h/30)%12,
+ f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+ return "#"+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,"0")).join("").toUpperCase()};
+const x2h=x=>{let r=parseInt(x.slice(1,3),16)/255,g=parseInt(x.slice(3,5),16)/255,b=parseInt(x.slice(5,7),16)/255;
+ const M=Math.max(r,g,b),m=Math.min(r,g,b),d=M-m,l=(M+m)/2;let h=0,s=0;
+ if(d){s=d/(1-Math.abs(2*l-1));h=M==r?((g-b)/d)%6:M==g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}
+ return {h:Math.round(h),s:Math.round(s*100),l:Math.round(l*100)}};
+const lum=c=>{const v=[1,3,5].map(i=>{const x=parseInt(h2x(c.h,c.s,c.l).slice(i,i+2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+const ink=c=>lum(c)>.4?"#15121f":"#ffffff";
+const hexOf=c=>h2x(c.h,c.s,c.l);
+
+let S={c:[],mode:"random",sel:-1};
+let hist=[],fut=[];
+const snap=()=>JSON.stringify(S.c);
+const push=()=>{hist.push(snap());if(hist.length>80)hist.shift();fut=[];btns()};
+const btns=()=>{$("undo").disabled=!hist.length;$("redo").disabled=!fut.length};
+
+const ICON={
+ lock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+ unlock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.6-1.7"/></svg>',
+ copy:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>',
+ tune:'<svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>'};
+
+function newColor(){return {h:rnd(0,360),s:rnd(40,90),l:rnd(30,78),k:false}}
+function fix(c){c.h=Math.round((c.h%360+360)%360);c.s=Math.round(clamp(c.s,0,100));c.l=Math.round(clamp(c.l,0,100));return c}
+
+function generate(){
+ const n=S.c.length,lk=S.c.find(c=>c.k),base=lk?lk.h:rnd(0,360);
+ S.c.forEach((c,i)=>{
+  if(c.k)return;
+  let h=base,s=rnd(42,90),l=rnd(28,80);
+  switch(S.mode){
+   case"analogous":h=base+(i-n/2)*rnd(16,30);break;
+   case"complementary":h=base+(i%2?180:0)+rnd(-14,14);break;
+   case"triad":h=base+(i%3)*120+rnd(-10,10);break;
+   case"mono":h=base+rnd(-6,6);s=rnd(30,80);l=12+(i/(n-1||1))*76+rnd(-4,4);break;
+   default:h=rnd(0,360)}
+  c.h=h;c.s=s;c.l=l;fix(c)});
+}
+
+function build(){
+ const m=$("main");m.innerHTML="";
+ S.c.forEach((c,i)=>{
+  const d=document.createElement("div");d.className="sw";d.dataset.i=i;
+  d.innerHTML=`<div class="act">
+   <button class="tune" aria-label="Tweak color ${i+1}" title="Tweak">${ICON.tune}</button>
+   <button class="cpy" aria-label="Copy hex" title="Copy">${ICON.copy}</button>
+   <button class="lock" aria-label="Lock color" title="Lock">${ICON.unlock}</button></div>
+   <button class="hex" title="Copy hex"></button><div class="nm"></div>`;
+  m.appendChild(d)});
+ $("n").textContent=S.c.length;
+ paint();
+}
+function paint(){
+ document.querySelectorAll(".sw").forEach((d,i)=>{
+  const c=S.c[i];if(!c)return;
+  d.style.backgroundColor=hexOf(c);d.style.color=ink(c);
+  d.classList.toggle("lk",c.k);d.classList.toggle("sel",S.sel===i);
+  d.querySelector(".hex").textContent=hexOf(c);
+  d.querySelector(".nm").textContent=`H${c.h} S${c.s} L${c.l}`;
+  d.querySelector(".lock").innerHTML=c.k?ICON.lock:ICON.unlock;
+  d.querySelector(".lock").setAttribute("aria-pressed",c.k)});
+ if(S.sel>=0)sheetSync();
+ save();
+}
+
+/* sheet */
+function openSheet(i){S.sel=i;$("sheet").classList.add("on");sheetSync();paint()}
+function closeSheet(){S.sel=-1;$("sheet").classList.remove("on");paint()}
+function sheetSync(skip){
+ const c=S.c[S.sel];if(!c)return;
+ $("stt").textContent=`Tweak color ${S.sel+1}`;
+ if(skip!=="r"){$("h").value=c.h;$("s").value=c.s;$("l").value=c.l}
+ $("ho").textContent=c.h+"°";$("so").textContent=c.s+"%";$("lo").textContent=c.l+"%";
+ $("h").style.background="linear-gradient(90deg,"+[0,60,120,180,240,300,360].map(h=>h2x(h,c.s,c.l)).join(",")+")";
+ $("s").style.background=`linear-gradient(90deg,${h2x(c.h,0,c.l)},${h2x(c.h,100,c.l)})`;
+ $("l").style.background=`linear-gradient(90deg,#000,${h2x(c.h,c.s,50)},#fff)`;
+ $("chip").style.background=hexOf(c);
+ if(skip!=="x")$("hexin").value=hexOf(c);
+}
+let pushed=false;
+["h","s","l"].forEach(id=>{
+ $(id).addEventListener("pointerdown",()=>{push();pushed=true});
+ $(id).addEventListener("keydown",()=>{if(!pushed){push();pushed=true}});
+ $(id).addEventListener("keyup",()=>pushed=false);
+ $(id).addEventListener("input",e=>{const c=S.c[S.sel];c[id]=+e.target.value;paint();sheetSync("r")});
+ $(id).addEventListener("change",()=>pushed=false)});
+$("hexin").addEventListener("input",e=>{
+ let v=e.target.value.trim();if(v[0]!=="#")v="#"+v;
+ if(/^#[0-9a-fA-F]{6}$/.test(v)){push();const c=S.c[S.sel],o=x2h(v);c.h=o.h;c.s=o.s;c.l=o.l;paint();sheetSync("x")}});
+$("sx").onclick=closeSheet;
+
+/* actions */
+$("main").addEventListener("click",e=>{
+ const d=e.target.closest(".sw");if(!d)return;const i=+d.dataset.i,c=S.c[i];
+ if(e.target.closest(".lock")){push();c.k=!c.k;paint();toast(c.k?"Locked":"Unlocked")}
+ else if(e.target.closest(".tune"))openSheet(i);
+ else if(e.target.closest(".cpy,.hex"))copy(hexOf(c),`Copied ${hexOf(c)}`)});
+$("gen").onclick=()=>{push();generate();paint()};
+$("mode").onchange=e=>{S.mode=e.target.value;push();generate();paint()};
+$("more").onclick=()=>{if(S.c.length<8){push();S.c.push(newColor());generate();build()}};
+$("less").onclick=()=>{if(S.c.length>3){push();let i=S.c.map(c=>c.k).lastIndexOf(false);if(i<0)i=S.c.length-1;S.c.splice(i,1);S.sel=-1;$("sheet").classList.remove("on");build()}};
+function undo(){if(!hist.length)return;fut.push(snap());S.c=JSON.parse(hist.pop());S.sel=-1;$("sheet").classList.remove("on");build();btns()}
+function redo(){if(!fut.length)return;hist.push(snap());S.c=JSON.parse(fut.pop());S.sel=-1;$("sheet").classList.remove("on");build();btns()}
+$("undo").onclick=undo;$("redo").onclick=redo;
+document.addEventListener("keydown",e=>{
+ const t=e.target.tagName;
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&t!=="INPUT"){e.preventDefault();e.shiftKey?redo():undo()}
+ else if(e.code==="Space"&&!["INPUT","BUTTON","SELECT","TEXTAREA"].includes(t)&&!document.querySelector("dialog[open]")){e.preventDefault();$("gen").click()}
+ else if(e.key==="Escape"&&S.sel>=0)closeSheet()});
+
+/* clipboard / toast */
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1500)}
+function copy(txt,msg){
+ const fb=()=>{const a=document.createElement("textarea");a.value=txt;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()};
+ try{navigator.clipboard&&window.isSecureContext?navigator.clipboard.writeText(txt).catch(fb):fb()}catch(_){fb()}
+ toast(msg)}
+
+/* export */
+let fmt="css";
+function exportText(){
+ const hx=S.c.map(hexOf);
+ if(fmt==="css")return ":root{\n"+hx.map((h,i)=>`  --color-${i+1}: ${h};`).join("\n")+"\n}";
+ if(fmt==="json")return JSON.stringify(S.c.map((c,i)=>({name:"color-"+(i+1),hex:hexOf(c),hsl:`hsl(${c.h} ${c.s}% ${c.l}%)`})),null,2);
+ return hx.join("\n")}
+function showExport(){$("out").textContent=exportText();document.querySelectorAll("#tabs .pill").forEach(b=>b.classList.toggle("on",b.dataset.f===fmt))}
+$("exp").onclick=()=>{showExport();$("dx").showModal()};
+$("tabs").onclick=e=>{const b=e.target.closest("[data-f]");if(b){fmt=b.dataset.f;showExport()}};
+$("cp").onclick=()=>copy($("out").textContent,"Palette copied");
+$("ver").onclick=()=>$("dv").showModal();
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
+document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d)d.close()}));
+
+/* persistence (local browser only) */
+function save(){try{localStorage.setItem("palette-studio",JSON.stringify({c:S.c,mode:S.mode}))}catch(_){}}
+function load(){try{const v=JSON.parse(localStorage.getItem("palette-studio")||"null");
+ if(v&&Array.isArray(v.c)&&v.c.length>=3&&v.c.length<=8){S.c=v.c.map(c=>({h:+c.h||0,s:+c.s||0,l:+c.l||0,k:!!c.k}));S.mode=v.mode||"random";return true}}catch(_){}return false}
+
+if(!load()){S.c=Array.from({length:5},newColor);generate()}
+$("mode").value=S.mode;
+build();btns();
+document.title="Palette Studio v"+VERSION;
+})();
+</script>
+</body>
+</html>
